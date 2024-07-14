@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "482813011051",
+    "project_id": "loginamc-e1d91",
+    "storage_bucket": "loginamc-e1d91.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482813011051:android:65f3e0763bf0da17d83d2e",
+        "android_client_info": {
+          "package_name": "com.miguelavalos.loginamc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD7G7EIj_iXpFGdpfkZGl-FJl-Nx4KufKs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
