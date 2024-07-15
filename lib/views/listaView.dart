@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/helpers/timezone_helper.dart';
-import 'package:loginamc/views/profesor_profile.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 class AsistenciaView extends StatefulWidget {
