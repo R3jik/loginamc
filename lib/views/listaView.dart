@@ -349,15 +349,6 @@ class _AsistenciaViewState extends State<AsistenciaView> {
             ),
           ],
         ),
-        floatingActionButton: IconButton(
-          onPressed: (){
-          Navigator.push(context,MaterialPageRoute(builder: (context) => ProfesorProfile(profesorId: widget.profesorId, seccionId: widget.seccionId)));
-          }, 
-          icon: 
-          const Icon(Icons.person),
-        
-          color: Colors.red
-          ),
       ),
     );
   }

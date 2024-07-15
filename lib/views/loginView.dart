@@ -47,7 +47,7 @@ class _LoginPageState extends State<LoginPage> {
     if (profesorDoc.exists) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Mainview(user: user,)),
+        MaterialPageRoute(builder: (context) => NavigatorProfesor(user: user)),
       );
       return;
     }
