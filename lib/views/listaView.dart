@@ -29,6 +29,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
   int _totalFaltantes = 0;
   int _totalTardanzas = 0;
   String _cursoNombre = '';  // Añadimos una variable para el nombre del curso
+  bool _isLoading = false;
   TextStyle texto = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,
@@ -96,7 +97,14 @@ class _AsistenciaViewState extends State<AsistenciaView> {
     });
   }
 
-  void _guardarAsistencia() async {
+  Future <void> _guardarAsistencia() async {
+    setState(() {
+      _isLoading = true;
+    });
+    // Mostrar mensaje de que se está guardando la lista
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Guardando asistencia...'),
+    ));
     // Validación para asegurarse de que todas las alumnas tienen un estado válido
     bool todasValidas = _alumnas.every((alumna) => alumna['estado'] != 'none');
     if (!todasValidas) {
@@ -129,10 +137,12 @@ class _AsistenciaViewState extends State<AsistenciaView> {
         'estado': alumna['estado'],
       });
     }
-
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('Asistencia guardada exitosamente'),
     ));
+    setState(() {
+      _isLoading = false;
+    });
     Navigator.pop(context);
   }
   void _marcarAsistenciaATodas() {
@@ -332,7 +342,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                   ),
                   const SizedBox(height: 10,),
                   GestureDetector(
-                    onTap: _guardarAsistencia,
+                    onTap: _isLoading ? null : _guardarAsistencia,
                     child: Container(
                       height: screenHeight*0.05,
                       width: screenWidth*0.6,
@@ -340,7 +350,10 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                         borderRadius: BorderRadius.all(Radius.circular(20)),
                         color: Color(0XFF005FA9)
                       ),
-                      child: Center(child: Text("Guardar Asistencia", style: texto,)),
+                      child: Center(
+                        child: _isLoading
+                        ? const CircularProgressIndicator( valueColor:  AlwaysStoppedAnimation<Color>(Colors.white),)
+                        :  Text("Guardar Asistencia", style: texto,)),
                     ),
                   ),
                 ],

@@ -2,20 +2,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:loginamc/views/mainSiageView.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/profesor_profile.dart';
 
 
-class NavigatorProfesor extends StatefulWidget {
+class NavigatorAdmin extends StatefulWidget {
   final User user;
 
-  const NavigatorProfesor({super.key, required this.user});
+  const NavigatorAdmin({super.key, required this.user});
 
   @override
-  State<NavigatorProfesor> createState() => _NavigatorProfesorState();
+  State<NavigatorAdmin> createState() => _NavigatorAdminState();
 }
 
-class _NavigatorProfesorState extends State<NavigatorProfesor> {
+class _NavigatorAdminState extends State<NavigatorAdmin> {
   
   int _selectedIndex = 0;
   late final List<Widget> _widgetOptions;
@@ -24,7 +25,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
   void initState(){
     super.initState();
     _widgetOptions = <Widget>[
-      Mainview(user: widget.user),
+      MainSiageView(user: widget.user),
       ProfesorProfile(profesorId: widget.user),
     ];
   }
@@ -43,7 +44,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
           Container(
               child: GNav(
               //padding: EdgeInsets.all(30),
-              tabMargin: const EdgeInsets.only(top: 8, bottom:8, left: 20,right: 20),
+              tabMargin: const EdgeInsets.only(top: 10, bottom:10, left: 20,right: 20),
               tabBackgroundColor: const Color.fromRGBO(7, 30, 48, 0.7),
               backgroundColor: const Color.fromRGBO(0, 18, 31, 1),
               tabBorderRadius: 100, 
@@ -53,14 +54,15 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
                 icon: Icons.home,
                 iconColor: Colors.white,
                 iconActiveColor: Colors.white,
-                text: "Inicio",
+                text: "Añadir Profesores",
                 textColor: Colors.white,
                 ),
+          
               GButton(
-                icon: Icons.person_pin,
+                icon: Icons.add_moderator,
                 iconColor: Colors.white,
                 iconActiveColor: Colors.white,
-                text: "Perfil",
+                text: "Añadir Alumnas",
                 textColor: Colors.white,
                 ),
             ],

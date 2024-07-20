@@ -58,7 +58,9 @@ class _UploadPageState extends State<UploadPage> {
       final fields = await input.transform(utf8.decoder).transform(const CsvToListConverter()).toList();
 
       setState(() {
-        _tableData = fields;
+        _tableData = fields.map((row) {
+          return row.map((cell) => cell == null || cell.toString().trim().isEmpty ? 'No registrado' : cell).toList();
+        }).toList();
         _message = 'Datos cargados exitosamente desde CSV';
       });
     } catch (e) {
@@ -75,7 +77,9 @@ class _UploadPageState extends State<UploadPage> {
 
       var sheet = excel.tables[excel.tables.keys.first];
       setState(() {
-        _tableData = sheet!.rows.map((row) => row.map((cell) => cell?.value ?? '').toList()).toList();
+        _tableData = sheet!.rows.map((row) {
+          return row.map((cell) => cell == null || cell.value == null || cell.value.toString().trim().isEmpty ? 'No registrado' : cell.value).toList();
+        }).toList();
         _message = 'Datos cargados exitosamente desde Excel';
       });
     } catch (e) {
@@ -87,18 +91,24 @@ class _UploadPageState extends State<UploadPage> {
 
   Future<void> _uploadToFirestore() async {
     try {
-      for (var row in _tableData.skip(1)) { // Skip header row
-        await FirebaseFirestore.instance.collection('ALUMNAS').doc(row[0].toString()).set({
-          'nombre': row[1].toString(),
-          'apellido_paterno': row[2].toString(),
-          'apellido_materno': row[3].toString(),
-          'fecha_nacimiento': row[4].toString(),
-          'genero': row[5].toString(),
-          'celular': row[6].toString(),
-          'email': row[7].toString(),
-          'seccionId': row[8].toString(),
-          'auxiliarId': row.length > 9 ? row[9].toString() : null,
-        }, SetOptions(merge: true));
+      // Filtrar y subir solo las filas válidas
+      for (var i = 1; i < _tableData.length; i++) { // Saltar la cabecera
+        var row = _tableData[i];
+        String id = row[0].toString().trim();
+        if (id.isNotEmpty && id != 'No registrado' && RegExp(r'^\d{8}$').hasMatch(id)) {
+          await FirebaseFirestore.instance.collection('ALUMNAS').doc(id).set({
+            'nombre': row[1].toString(),
+            'apellido_paterno': row[2].toString(),
+            'apellido_materno': row[3].toString(),
+            'seccionId': row[11].toString(),
+            'genero': row[6].toString(),
+            'dni_apoderado': row[7].toString(),
+            'apellidos_nombre_apoderado': row[8].toString(),
+            'parentesco_apoderado': row[9].toString(),
+            'celular_apoderado': row[10].toString(),
+            'auxiliarId': row.length > 12 ? row[12].toString() : null,
+          }, SetOptions(merge: true));
+        }
       }
       setState(() {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -141,10 +151,14 @@ class _UploadPageState extends State<UploadPage> {
                                 columns: _tableData[0].map((header) => DataColumn(label: Text(header.toString()))).toList(),
                                 rows: _tableData
                                     .skip(1)
+                                    .where((row) {
+                                      String id = row[0].toString().trim();
+                                      return id.isNotEmpty && id != 'No registrado' && RegExp(r'^\d{8}$').hasMatch(id);
+                                    })
                                     .map((row) {
                                       final filledRow = List<dynamic>.from(row);
                                       while (filledRow.length < _tableData[0].length) {
-                                        filledRow.add('');
+                                        filledRow.add('No registrado');
                                       }
                                       return DataRow(cells: filledRow.map((cell) => DataCell(Text(cell.toString()))).toList());
                                     })

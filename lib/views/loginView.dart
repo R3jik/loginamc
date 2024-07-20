@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:loginamc/helpers/navigatorAdmin.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/mainAuxView.dart';
 import 'package:loginamc/views/resetPassView.dart';
@@ -59,6 +60,12 @@ class _LoginPageState extends State<LoginPage> {
       );
       return;
     }
+    DocumentSnapshot siageDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(user.uid).get();
+    if(siageDoc.exists){
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavigatorAdmin(user: user)));
+      return;
+    }
+    
     // Si no se encuentra el UID en ninguna colección, mostrar un mensaje de error
     setState(() {
       _errorMessage = 'Usuario no tiene rol asignado';
