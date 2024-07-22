@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/loginView.dart';
+import 'package:loginamc/viewsSiage/createUsers.dart';
 import 'package:loginamc/viewsSiage/updateAlumnas.dart';
 import 'package:loginamc/viewsSiage/updateSecciones.dart';
+import 'package:loginamc/viewsSiage/updateProfesores.dart';
 
 
     Color whiteColor = const Color(0XFFF6F6F6);
@@ -80,10 +81,10 @@ class MainSiageView extends StatelessWidget {
                           child: Container(
                                       height: heightCards,
                                       width: widthCards,
-                                      child: CardSubirDatos(texto: "Agregar Datos de los Usuarios",),
+                                      child: CardSubirDatos(texto: "Crear a los Usuarios",),
                           ),
                           onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPage()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => CreateUsersPage()));
                           },
                         ),
                         SizedBox(height: separacionCards),
@@ -94,7 +95,7 @@ class MainSiageView extends StatelessWidget {
                                       child: CardSubirDatos(texto: "Agregar Datos de los Profesores",),
                           ),
                           onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPage()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPageProfesores()));
                           },
                         ),
                         SizedBox(height: separacionCards),
@@ -180,7 +181,7 @@ class CardSubirDatos extends StatelessWidget {
       child: Text(
                       texto,
                       style: const TextStyle(
-                        fontSize: 28,
+                        fontSize: 24,
                         color: Colors.white, // El color se aplicará como un degradado por ShaderMask
                         fontWeight: FontWeight.bold,
                       ),
@@ -190,53 +191,5 @@ class CardSubirDatos extends StatelessWidget {
                           ],
                         ),
                       );
-  }
-}
-
-
-class GradoCard extends StatelessWidget {
-  final int numero;
-  final String nombre;
-
-  GradoCard({required this.numero, required this.nombre});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ShaderMask(
-            shaderCallback: (bounds) =>  LinearGradient(
-              colors: [fondo1 , lightBlue],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ).createShader(bounds),
-            child: Text(
-              numero.toString(),
-              style: const TextStyle(
-                fontSize: 80,
-                color: Colors.white, // El color se aplicará como un degradado por ShaderMask
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Text(
-            nombre,
-            style:  const TextStyle(
-              fontSize: 18,
-              color: Colors.black,
-              fontWeight: FontWeight.bold
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
   }
 }

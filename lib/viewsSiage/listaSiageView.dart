@@ -24,12 +24,12 @@ class AlumnadoSalonView extends StatefulWidget {
 
 class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
   List<Map<String, dynamic>> _alumnas = [];
-  int _totalAsistentes = 0;
+  //int _totalAsistentes = 0;
   int _totalAlumnas = 0;
-  int _totalFaltantes = 0;
-  int _totalTardanzas = 0;
-  String _cursoNombre = '';  // Añadimos una variable para el nombre del curso
-  bool _isLoading = false;
+  //int _totalFaltantes = 0;
+  //int _totalTardanzas = 0;
+  //String _cursoNombre = '';  // Añadimos una variable para el nombre del curso
+  //bool _isLoading = false;
   TextStyle texto = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,

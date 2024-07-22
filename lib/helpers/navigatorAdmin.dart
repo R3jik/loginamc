@@ -1,11 +1,9 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/viewsSiage/gradosView.dart';
 import 'package:loginamc/viewsSiage/mainSiageView.dart';
-import 'package:loginamc/views/profesor_profile.dart';
 
 
 class NavigatorAdmin extends StatefulWidget {
