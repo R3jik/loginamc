@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loginamc/helpers/navigatorAdmin.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
-import 'package:loginamc/views/mainAuxView.dart';
 import 'package:loginamc/views/resetPassView.dart';
 
 
@@ -15,6 +14,11 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 
 }
+class AppUser {
+  final String dni;
+
+  AppUser({required this.dni});
+}
 
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
@@ -24,52 +28,57 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
 
   Future<void> _signInWithEmailAndPassword() async {
-    if(_formKey.currentState!.validate()){
+    if (_formKey.currentState!.validate()) {
       try {
-        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      User user = userCredential.user!;
-      //Verificar el tipo de usuario
-      await _redirectUserBasedOnRole(user);
-    } on FirebaseAuthException catch (e) {
-      setState(() {
-        _errorMessage = e.message;
-      });
-    }
+        UserCredential userCredential =
+            await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+        User user = userCredential.user!;
+        // Verificar el tipo de usuario
+        await _redirectUserBasedOnRole(user);
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _errorMessage = e.message;
+        });
+      }
     }
   }
 
   Future<void> _redirectUserBasedOnRole(User user) async {
-    // Verificar en la colección 'profesores'
-    DocumentSnapshot profesorDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(user.uid).get();
-    if (profesorDoc.exists) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => NavigatorProfesor(user: user)),
-      );
-      return;
+    // Verificar en la colección 'USUARIOS'
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).get();
+    if (userDoc.exists) {
+      String role = userDoc.get('rol').toString().toUpperCase(); //Convierte el string en mayusculas.
+      String dni = userDoc.get('dni').toString(); // Convierte el DNI a String para usarlo como ID
+      AppUser appUser = AppUser(dni: dni);
+
+      if (role == 'PROFESOR') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NavigatorProfesor(user: appUser)),
+        );
+      } else if (role == 'AUXILIAR') {
+        /*Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => MainAuxview(user: appUser)),
+        );*/
+      } else if (role == 'ADMINISTRADOR') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => NavigatorAdmin(user: appUser)),
+        );
+      } else {
+        setState(() {
+          _errorMessage = 'Usuario no tiene rol asignado';
+        });
+      }
+    } else {
+      setState(() {
+        _errorMessage = 'Usuario no registrado';
+      });
     }
-    // Verificar en la colección 'auxiliares'
-    DocumentSnapshot auxiliarDoc = await FirebaseFirestore.instance.collection('AUXILIARES').doc(user.uid).get();
-    if (auxiliarDoc.exists) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => MainAuxview(user: user)),
-      );
-      return;
-    }
-    DocumentSnapshot siageDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(user.uid).get();
-    if(siageDoc.exists){
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavigatorAdmin(user: user)));
-      return;
-    }
-    
-    // Si no se encuentra el UID en ninguna colección, mostrar un mensaje de error
-    setState(() {
-      _errorMessage = 'Usuario no tiene rol asignado';
-    });
   }
 
   @override

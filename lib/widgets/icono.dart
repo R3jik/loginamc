@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class IconoPerfil extends StatelessWidget {
-  Color fondoIconoClaro = Color(0XFF0066FF);
-  Color fondoIconoOscuro = Color(0XFF001220);
+  final Color fondoIconoClaro = const Color(0XFF0066FF);
+  final Color fondoIconoOscuro = const Color(0XFF001220);
 
-  IconoPerfil({super.key});
+  const IconoPerfil({super.key});
 
   @override
   Widget build(BuildContext context) {

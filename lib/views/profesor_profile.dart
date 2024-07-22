@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
+import 'package:loginamc/views/loginView.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -15,7 +16,7 @@ import 'package:loginamc/widgets/icono.dart';
 
 
 class ProfesorProfile extends StatefulWidget {
-  final User profesorId;
+  final AppUser profesorId; //Cambiar el tipo de dato User a AppUser e importar la pagina loginView.dart porque ahi esta la clase creada
 
   const ProfesorProfile({super.key, required this.profesorId,});
 
@@ -41,7 +42,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
   void _fetchProfesorData() async {
     DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
         .collection('PROFESORES')
-        .doc(widget.profesorId.uid)
+        .doc(widget.profesorId.dni)
         .get();
     setState(() {
       _profesorData = profesorDoc.data() as Map<String, dynamic>;
@@ -168,7 +169,6 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     Color whiteColor = const Color(0XFFF6F6F6);
-    Color lightBlue = const Color(0XFF0066FF);
     Color fondo1 = const Color(0XFF001220);
     Color whiteText = const Color(0XFFF3F3F3);
     Color fondo2 = const Color(0XFF071E30);

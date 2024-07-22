@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/listaView.dart';
-import 'package:loginamc/views/pruebaCSVView.dart';
+import 'package:loginamc/viewsSiage/listaSiageView.dart';
+
+
 
 Color whiteColor = const Color(0XFFF6F6F6);
     Color lightBlue = const Color(0XFF0066FF);
@@ -10,34 +12,66 @@ Color whiteColor = const Color(0XFFF6F6F6);
     Color fondo2 = const Color(0XFF071E30);
 
 
-class SeccionesAuxView extends StatelessWidget {
-  final String auxUid;
+class SeccionesSiagePage extends StatelessWidget {
+  final String profesorUid;
   final String gradoId;
   final String gradoNombre;
 
-  SeccionesAuxView({required this.auxUid, required this.gradoId, required this.gradoNombre});
+  SeccionesSiagePage({required this.profesorUid, required this.gradoId, required this.gradoNombre});
 
   Future<Map<String, dynamic>> getUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('AUXILIARES').doc(auxUid).get();
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(profesorUid).get();
     return userDoc.data() as Map<String, dynamic>;
   }
-  Future<List<Map<String, dynamic>>> getSecciones() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('AUXILIARES').doc(auxUid).get();
-    List<dynamic> seccionesIds = userDoc['seccionId'];
+  Future<List<Map<String, dynamic>>> getSecciones(String profesorUid, String gradoId) async {
+  try {
+    // Obtiene el documento del profesor
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(profesorUid).get();
     
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+    // Verifica si el documento existe y extrae la lista de secciones
+    if (!userDoc.exists) {
+      throw Exception('El documento del administrador no existe');
+    }
+
+    // Obtiene los IDs de secciones desde la subcolección SECCIONES
+    QuerySnapshot seccionesSnapshot = await FirebaseFirestore.instance
+        .collection('ADMINISTRADORES')
+        .doc(profesorUid)
         .collection('SECCIONES')
-        .where(FieldPath.documentId, whereIn: seccionesIds)
+        .get();
+
+    List<String> seccionesIds = seccionesSnapshot.docs.map((doc) => doc.id).toList();
+
+    if (seccionesIds.isEmpty) {
+      return []; // Si no hay IDs de secciones, retorna una lista vacía
+    }
+
+    List<Map<String, dynamic>> allSecciones = [];
+
+    // Divide la lista de seccionesIds en fragmentos de 30
+    for (var i = 0; i < seccionesIds.length; i += 30) {
+      var sublist = seccionesIds.sublist(i, i + 30 > seccionesIds.length ? seccionesIds.length : i + 30);
+
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('SECCIONES')
+        .where(FieldPath.documentId, whereIn: sublist)
         .where('gradoId', isEqualTo: gradoId)
         .get();
 
-    return querySnapshot.docs
-        .map((doc) => {
-              'id': doc.id,
-              'letra': doc['letra'],
-            })
-        .toList();
+      allSecciones.addAll(querySnapshot.docs.map((doc) {
+        return {
+          'id': doc.id,
+          'letra': doc.get('letra'),
+        };
+      }).toList());
+    }
+
+    return allSecciones;
+  } catch (e) {
+    // Manejo de errores
+    print('Error al obtener secciones: $e');
+    return []; // Retorna una lista vacía en caso de error
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +98,7 @@ class SeccionesAuxView extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.all(screenWidth*0.05),
+                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -77,8 +111,8 @@ class SeccionesAuxView extends StatelessWidget {
                           return Text('Error: ${snapshot.error}', style: texto,);
                         } else {
                           Map<String, dynamic> userInfo = snapshot.data!;
-                          String greeting = userInfo['genero'] == 'Masculino' ? 'Bienvenido' : 'Bienvenida';
-                          return Text('$greeting, ${userInfo['nombre_aux']} ${userInfo['apellido_aux']}',style: TextStyle(
+                          String greeting = userInfo['genero'].toString().toUpperCase() == 'MASCULINO' ? 'Bienvenido' : 'Bienvenida';
+                          return Text('$greeting, ${userInfo['nombre']} ${userInfo['apellido_paterno']}',style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: whiteText,
@@ -97,7 +131,7 @@ class SeccionesAuxView extends StatelessWidget {
               bottom: 0,
             child: Container(
               width: screenWidth,
-                height: screenHeight*0.8,
+                height: screenHeight*0.82,
                 decoration: BoxDecoration(
                   color: fondo2,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(50))
@@ -121,14 +155,14 @@ class SeccionesAuxView extends StatelessWidget {
                     height: screenHeight*0.7,
                     width: screenWidth*0.9,
                     child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: getSecciones(),
+                      future: getSecciones(profesorUid,gradoId),
                       builder: (context, snapshot) {
                         if (snapshot.connectionState == ConnectionState.waiting) {
                           return Center(child: CircularProgressIndicator());
                         } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
+                          return Center(child: Text('Error: ${snapshot.error}',style: texto,));
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Center(child: Text('No tienes secciones asignadas'));
+                          return Center(child: Text('No tienes secciones asignadas',style: texto,));
                         } else {
                           List<Map<String, dynamic>> secciones = snapshot.data!;
                           return GridView.builder(
@@ -143,7 +177,7 @@ class SeccionesAuxView extends StatelessWidget {
                           itemBuilder: (context, index) {
                           return GestureDetector(
                           onTap: () {
-                            Navigator.push(context,MaterialPageRoute(builder: (context) => AsistenciaView(seccionId: secciones[index]['id'],seccionNombre: secciones[index]['letra'], gradoNombre: gradoNombre, profesorId: auxUid,),
+                            Navigator.push(context,MaterialPageRoute(builder: (context) =>  AlumnadoSalonView(seccionId: secciones[index]['id'],seccionNombre: secciones[index]['letra'], gradoNombre: gradoNombre, profesorId: profesorUid,),
                       ),
                     );
                                     },
@@ -163,11 +197,7 @@ class SeccionesAuxView extends StatelessWidget {
           ),
           ],
         ),
-        floatingActionButton: IconButton(
-          onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPage()));
-          }, icon: const Icon(Icons.add),
-          color: lightBlue,),
+        
       ),
     );
   }

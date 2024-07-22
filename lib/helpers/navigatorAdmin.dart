@@ -2,13 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:loginamc/views/mainSiageView.dart';
-import 'package:loginamc/views/mainView.dart';
+import 'package:loginamc/views/loginView.dart';
+import 'package:loginamc/viewsSiage/gradosView.dart';
+import 'package:loginamc/viewsSiage/mainSiageView.dart';
 import 'package:loginamc/views/profesor_profile.dart';
 
 
 class NavigatorAdmin extends StatefulWidget {
-  final User user;
+  final AppUser user;
 
   const NavigatorAdmin({super.key, required this.user});
 
@@ -26,7 +27,7 @@ class _NavigatorAdminState extends State<NavigatorAdmin> {
     super.initState();
     _widgetOptions = <Widget>[
       MainSiageView(user: widget.user),
-      ProfesorProfile(profesorId: widget.user),
+      Gradosview(user: widget.user),
     ];
   }
   
@@ -51,18 +52,18 @@ class _NavigatorAdminState extends State<NavigatorAdmin> {
               duration: const Duration(milliseconds: 400),
               tabs:const [
               GButton(
-                icon: Icons.home,
+                icon:Icons.update,
                 iconColor: Colors.white,
                 iconActiveColor: Colors.white,
-                text: "Añadir Profesores",
+                text: "Añadir datos",
                 textColor: Colors.white,
                 ),
           
               GButton(
-                icon: Icons.add_moderator,
+                icon: Icons.view_stream,
                 iconColor: Colors.white,
                 iconActiveColor: Colors.white,
-                text: "Añadir Alumnas",
+                text: "Grados",
                 textColor: Colors.white,
                 ),
             ],

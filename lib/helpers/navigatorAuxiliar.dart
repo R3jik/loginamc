@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:loginamc/views/mainAuxView.dart';
+import 'package:loginamc/viewsAuxiliar/mainAuxView.dart';
 
 
 class NavigatorAuxiliar extends StatefulWidget {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/loginView.dart';
-import 'package:loginamc/views/seccionesProfesoresView.dart';
+import 'package:loginamc/viewsSiage/seccionesView.dart';
 
 
 
@@ -12,24 +12,24 @@ Color whiteColor = const Color(0XFFF6F6F6);
     Color whiteText = const Color(0XFFF3F3F3);
     Color fondo2 = const Color(0XFF071E30);
 
-class Mainview extends StatefulWidget {
-  final AppUser user; //Cambiar el tipo de dato user a AppUser e importar la pagina loginView.dart porque ahi esta la clase creada
+class Gradosview extends StatefulWidget {
+  final AppUser user;
   
-  const Mainview({ required this.user});
+  const Gradosview({ required this.user});
   
 
   @override
-  State<Mainview> createState() => _MainviewState();
+  State<Gradosview> createState() => _GradosViewState();
 }
 
-class _MainviewState extends State<Mainview> {
+class _GradosViewState extends State<Gradosview> {
   Future<Map<String, dynamic>> getUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get(); //Cambiar la terminación .uid por .dni que pide el AppUser
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(widget.user.dni).get();
     return userDoc.data() as Map<String, dynamic>;
   }
 
   Future<List<Map<String, dynamic>>> getGrados() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get();//Cambiar la terminación .uid por .dni que pide el AppUser
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(widget.user.dni).get();
     List<dynamic> gradoIds = userDoc['gradoId'];
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('GRADOS').where(FieldPath.documentId,whereIn: gradoIds)
@@ -85,7 +85,7 @@ class _MainviewState extends State<Mainview> {
                         return Text('Error: ${snapshot.error}', style: texto,);
                       } else {
                         Map<String, dynamic> userInfo = snapshot.data!;
-                        String greeting = userInfo['genero'].toString().toUpperCase() == 'MASCULINO' ? 'Bienvenido' : 'Bienvenida';
+                        String greeting = userInfo['genero'] == 'Masculino' ? 'Bienvenido' : 'Bienvenida';
                         return Text('$greeting, ${userInfo['nombre']} ${userInfo['apellido_paterno']}',style:  texto,);
                       }
                     },
@@ -146,7 +146,7 @@ class _MainviewState extends State<Mainview> {
                           itemBuilder: (context, index) {
                           return GestureDetector(
                           onTap: () {
-                            Navigator.push(context,MaterialPageRoute(builder: (context) => SeccionesProfesoresPage(profesorUid: widget.user.dni,gradoId: grados[index]['id'],gradoNombre: grados[index]['nombre'],
+                            Navigator.push(context,MaterialPageRoute(builder: (context) => SeccionesSiagePage(profesorUid: widget.user.dni,gradoId: grados[index]['id'],gradoNombre: grados[index]['nombre'],
                         ),
                       ),
                     );

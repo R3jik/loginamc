@@ -2,12 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/profesor_profile.dart';
 
 
 class NavigatorProfesor extends StatefulWidget {
-  final User user;
+  final AppUser user; //Cambiar el tipo de dato user a AppUser e importar la pagina loginView.dart porque ahi esta la clase creada
 
   const NavigatorProfesor({super.key, required this.user});
 

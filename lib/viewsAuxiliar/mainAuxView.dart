@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:loginamc/views/seccionesAuxView.dart';
+import 'package:loginamc/viewsAuxiliar/seccionesAuxView.dart';
 
 
     Color whiteColor = const Color(0XFFF6F6F6);
