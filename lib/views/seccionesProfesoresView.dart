@@ -99,7 +99,7 @@ class SeccionesProfesoresPage extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
+                padding: EdgeInsets.all(screenWidth*0.05),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -121,18 +121,23 @@ class SeccionesProfesoresPage extends StatelessWidget {
                         }
                       },
                     ),
-                    Image(image: const AssetImage('assets/images/Insignia_AMC.png'),
-                    width: screenWidth*0.1,
-                    height: screenHeight*0.1,)
+                    SizedBox(
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
+                      child: Image.asset(
+                        'assets/images/Insignia_AMC.png',
+                      ),
+                    ),
                   ],
                 ),
               )
             ),
             Positioned(
-              bottom: 0,
+              
+              bottom: screenHeight*0.08,
             child: Container(
               width: screenWidth,
-                height: screenHeight*0.82,
+                height: screenHeight*0.8,
                 decoration: BoxDecoration(
                   color: fondo2,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(50))
