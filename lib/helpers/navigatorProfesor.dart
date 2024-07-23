@@ -5,6 +5,7 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/profesor_profile.dart';
+import 'package:loginamc/views/searchView.dart';
 
 
 class NavigatorProfesor extends StatefulWidget {
@@ -25,56 +26,59 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
   void initState(){
     super.initState();
     _widgetOptions = <Widget>[
-      Mainview(user: widget.user),
+      Mainview(user: widget.user),     
+      BuscarView(user: widget.user),
       ProfesorProfile(profesorId: widget.user),
     ];
   }
   
+  void _onTabChange(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
-  
   Widget build(BuildContext context) {
-    
     return SafeArea(
       child: Scaffold(
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
+        bottomNavigationBar: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+          color: const Color.fromRGBO(0, 18, 31, 1),
+          child: GNav(
+            tabMargin: const EdgeInsets.only(top: 2, bottom: 0),
+            tabBackgroundColor: const Color.fromRGBO(7, 30, 48, 0.7),
+            tabBorderRadius: 100,
+            duration: const Duration(milliseconds: 400),
+            gap: 8,
+            color: Colors.white,
+            activeColor: Colors.white,
+            backgroundColor: const Color.fromRGBO(0, 18, 31, 1),
       
-        bottomNavigationBar: 
-          Container(
-              child: GNav(
-              //padding: EdgeInsets.all(30),
-              tabMargin: const EdgeInsets.only(top: 8, bottom:8, left: 20,right: 20),
-              tabBackgroundColor: const Color.fromRGBO(7, 30, 48, 0.7),
-              backgroundColor: const Color.fromRGBO(0, 18, 31, 1),
-              tabBorderRadius: 100, 
-              duration: const Duration(milliseconds: 400),
-              tabs:const [
+            tabs: const [
               GButton(
                 icon: Icons.home,
-                iconColor: Colors.white,
-                iconActiveColor: Colors.white,
                 text: "Inicio",
-                textColor: Colors.white,
-                ),
+              ),
+              GButton(
+                icon: Icons.search_rounded,
+                text: "Buscar",
+              ),
               GButton(
                 icon: Icons.person_pin,
-                iconColor: Colors.white,
-                iconActiveColor: Colors.white,
                 text: "Perfil",
-                textColor: Colors.white,
-                ),
+              ),
             ],
-            
-            selectedIndex: _selectedIndex, 
-            onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            }
-            )
-          ),
-        
+            selectedIndex: _selectedIndex,
+              onTabChange: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
+              },)
+        ),
       ),
     );
   }

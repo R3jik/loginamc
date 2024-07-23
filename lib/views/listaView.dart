@@ -97,54 +97,79 @@ class _AsistenciaViewState extends State<AsistenciaView> {
     });
   }
 
-  Future <void> _guardarAsistencia() async {
-    setState(() {
-      _isLoading = true;
-    });
-    // Mostrar mensaje de que se está guardando la lista
+  Future<void> _guardarAsistencia() async {
+  setState(() {
+    _isLoading = true;
+  });
+
+  // Mostrar mensaje de que se está guardando la lista
+  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    content: Text('Guardando asistencia...'),
+  ));
+
+  // Validación para asegurarse de que todas las alumnas tienen un estado válido
+  bool todasValidas = _alumnas.every((alumna) => alumna['estado'] != 'none');
+  if (!todasValidas) {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Guardando asistencia...'),
-    ));
-    // Validación para asegurarse de que todas las alumnas tienen un estado válido
-    bool todasValidas = _alumnas.every((alumna) => alumna['estado'] != 'none');
-    if (!todasValidas) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Debe marcar la asistencia, tardanza o falta para todas las alumnas'),
-      ));
-      return;
-    }
-
-    final tz.TZDateTime now = TimeZoneHelper.nowInLima();
-    final String fecha = DateFormat('dd-MM-yyyy').format(now);
-    final Timestamp timestamp = Timestamp.fromDate(now);
-
-    DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
-        .collection('PROFESORES')
-        .doc(widget.profesorId)
-        .get();
-    String cursoId = profesorDoc['cursoId'];
-
-    for (var alumna in _alumnas) {
-      String asistenciaId = '$fecha-$cursoId';
-      await FirebaseFirestore.instance
-          .collection('ALUMNAS')
-          .doc(alumna['id'])
-          .collection('asistencia')
-          .doc(asistenciaId)  // Usamos el UID personalizado
-          .set({
-        'fecha': timestamp,
-        'cursoNombre': _cursoNombre,  // Guardamos el nombre del curso
-        'estado': alumna['estado'],
-      });
-    }
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Asistencia guardada exitosamente'),
+      content: Text('Debe marcar la asistencia, tardanza o falta para todas las alumnas'),
     ));
     setState(() {
       _isLoading = false;
     });
-    Navigator.pop(context);
+    return;
   }
+
+  final tz.TZDateTime now = TimeZoneHelper.nowInLima();
+  final String fecha = DateFormat('dd-MM-yyyy').format(now);
+  final String hora = DateFormat('HH:mm:ss').format(now);
+  final Timestamp timestamp = Timestamp.fromDate(now);
+
+  // Referencia al documento del profesor
+  DocumentReference profesorRef = FirebaseFirestore.instance
+      .collection('PROFESORES')
+      .doc(widget.profesorId);
+
+  // Crear un nuevo documento en la colección ASISTENCIAS
+  DocumentReference asistenciaRef = await profesorRef
+      .collection('ASISTENCIAS')
+      .add({
+    'cursoId': _cursoNombre,
+    'fecha': fecha,
+    'hora': hora,
+    'seccionId': widget.seccionId,
+    'totalAlumnas': _totalAlumnas,
+    'totalAsistencias': _totalAsistentes,
+    'totalFaltas': _totalFaltantes,
+    'totalTardanzas': _totalTardanzas,
+  });
+
+  // Obtener el ID dinámico generado
+  String asistenciaId = asistenciaRef.id;
+
+  // Actualizar el documento con su propio ID
+  await asistenciaRef.update({'id': asistenciaId});
+
+  // Guardar los detalles de cada alumna
+  for (var alumna in _alumnas) {
+    await asistenciaRef.collection('DETALLES').doc(alumna['id']).set({
+      'nombre': alumna['nombre'],
+      'apellido_paterno': alumna['apellido_paterno'],
+      'apellido_materno': alumna['apellido_materno'],
+      'estado': alumna['estado'],
+      'fecha': fecha,
+      'hora': hora,
+    });
+  }
+
+  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    content: Text('Asistencia guardada exitosamente'),
+  ));
+  setState(() {
+    _isLoading = false;
+  });
+  Navigator.pop(context);
+}
+
   void _marcarAsistenciaATodas() {
     setState(() {
       for (var i = 0; i < _alumnas.length; i++) {
@@ -209,7 +234,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                 children: [
                   Container(
                     width: screenWidth ,
-                    height: screenHeight * 0.15,
+                    height: screenHeight * 0.12,
                     decoration:  BoxDecoration(
                       color: fondo1,
                       borderRadius:  const BorderRadius.all(Radius.circular(20))
