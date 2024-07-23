@@ -44,10 +44,16 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
         .collection('PROFESORES')
         .doc(widget.profesorId.dni)
         .get();
+    QuerySnapshot  seccionesDoc = await FirebaseFirestore.instance
+      .collection('PROFESORES')
+      .doc(widget.profesorId.dni)
+      .collection('SECCIONES')
+      .get();
+    List<String> idsSecciones = seccionesDoc.docs.map((doc) => doc.id).toList();
     setState(() {
       _profesorData = profesorDoc.data() as Map<String, dynamic>;
       cursoId = profesorDoc['cursoId'];
-      _seccionData = List.from(profesorDoc['seccionId']);
+      _seccionData = idsSecciones;
     });
     DocumentSnapshot<Map<String, dynamic>> nombreCurso = await FirebaseFirestore
         .instance
