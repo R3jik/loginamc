@@ -23,13 +23,11 @@ class BuscarView extends StatefulWidget {
   _BuscarViewState createState() => _BuscarViewState();
 }
 
-
 class _BuscarViewState extends State<BuscarView> {
   TextEditingController _searchController = TextEditingController();
   List<Map<String, dynamic>> _alumnas = [];
   List<Map<String, dynamic>> _filteredAlumnas = [];
   bool _isLoading = true;
-  // ignore: unused_field
   bool _isSortedByName = true;
 
   @override
@@ -60,7 +58,7 @@ class _BuscarViewState extends State<BuscarView> {
 
     try {
       QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('PROFESORES').get();
-      List<Map<String, dynamic>> alumnas = [];
+      Map<String, Map<String, dynamic>> alumnasMap = {};
 
       for (var profesorDoc in profesoresSnapshot.docs) {
         QuerySnapshot asistenciasSnapshot = await profesorDoc.reference.collection('ASISTENCIAS').get();
@@ -90,22 +88,22 @@ class _BuscarViewState extends State<BuscarView> {
           for (var detalleDoc in detallesSnapshot.docs) {
             var detalleData = detalleDoc.data() as Map<String, dynamic>;
 
-            alumnas.add({
+            alumnasMap[detalleDoc.id] = {
               'id': detalleDoc.id,
               'nombre': detalleData['nombre'],
               'apellido_paterno': detalleData['apellido_paterno'],
               'apellido_materno': detalleData['apellido_materno'],
               'fecha': formattedDate,
               'estado': detalleData['estado'],
-            });
+            };
           }
         }
       }
 
       if (mounted) {
         setState(() {
-          _alumnas = alumnas;
-          _filteredAlumnas = alumnas;
+          _alumnas = alumnasMap.values.toList();
+          _filteredAlumnas = _alumnas;
           _isLoading = false;
         });
         _saveData();
@@ -247,7 +245,6 @@ class _BuscarViewState extends State<BuscarView> {
                                     MaterialPageRoute(
                                       builder: (context) => DetalleAlumnaView(
                                         alumna: alumna,
-                                         // Pasar el profesorId aquí
                                       ),
                                     ),
                                   );
@@ -291,7 +288,6 @@ class _BuscarViewState extends State<BuscarView> {
                                         ],
                                       ),
                                     ),
-
                                   ),
                                 ),
                               );
