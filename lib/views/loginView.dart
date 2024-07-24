@@ -40,7 +40,26 @@ class _LoginPageState extends State<LoginPage> {
         await _redirectUserBasedOnRole(user);
       } on FirebaseAuthException catch (e) {
         setState(() {
-          _errorMessage = e.message;
+          switch (e.code) {
+            case 'invalid-email':
+              _errorMessage = 'El correo electrónico no es válido.';
+              break;
+            case 'user-disabled':
+              _errorMessage = 'Esta cuenta ha sido deshabilitada.';
+              break;
+            case 'user-not-found':
+              _errorMessage = 'No se encontró una cuenta con este correo electrónico.';
+              break;
+            case 'wrong-password':
+              _errorMessage = 'La contraseña es incorrecta.';
+              break;
+            default:
+              _errorMessage = 'Error de autenticación. Por favor, inténtelo de nuevo.';
+          }
+        });
+      } catch (e) {
+        setState(() {
+          _errorMessage = 'Error de red. Por favor, verifique su conexión a Internet.';
         });
       } finally {
         setState(() {
@@ -51,34 +70,36 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _redirectUserBasedOnRole(User user) async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).get();
-    if (userDoc.exists) {
-      String role = userDoc.get('rol').toString().toUpperCase();
-      String dni = userDoc.get('dni').toString();
-      AppUser appUser = AppUser(dni: dni);
+    
+      DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).get();
+      if (userDoc.exists) {
+        String role = userDoc.get('rol').toString().toUpperCase();
+        String dni = userDoc.get('dni').toString();
+        AppUser appUser = AppUser(dni: dni);
 
-      if (role == 'PROFESOR') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => NavigatorProfesor(user: appUser)),
-        );
-      } else if (role == 'AUXILIAR') {
-        // Implementar navegación para AUXILIAR
-      } else if (role == 'ADMINISTRADOR') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => NavigatorAdmin(user: appUser)),
-        );
+        if (role == 'PROFESOR') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => NavigatorProfesor(user: appUser)),
+          );
+        } else if (role == 'AUXILIAR') {
+          // Implementar navegación para AUXILIAR
+        } else if (role == 'ADMINISTRADOR') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => NavigatorAdmin(user: appUser)),
+          );
+        } else {
+          setState(() {
+            _errorMessage = 'Usuario no tiene rol asignado';
+          });
+        }
       } else {
         setState(() {
-          _errorMessage = 'Usuario no tiene rol asignado';
+          _errorMessage = 'Usuario no registrado';
         });
       }
-    } else {
-      setState(() {
-        _errorMessage = 'Usuario no registrado';
-      });
-    }
+    
   }
 
   @override

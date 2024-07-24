@@ -55,6 +55,12 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
         .collection('PROFESORES')
         .doc(widget.profesorId.dni)
         .get();
+
+    if (!profesorDoc.exists) {
+      print('El documento del profesor no existe.');
+      return;
+    }
+
     print('Profesor Data: ${profesorDoc.data()}');
 
     // Actualizar el estado con los datos del profesor
@@ -69,6 +75,12 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
         .collection('CURSOS')
         .doc(cursoId)
         .get();
+
+    if (!nombreCurso.exists) {
+      print('El documento del curso no existe.');
+      return;
+    }
+
     print('Curso Data: ${nombreCurso.data()}');
 
     // Actualizar el estado con los datos del curso
@@ -83,17 +95,23 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
         .collection('SECCIONES')
         .get();
 
-    // Convertir los documentos de la subcolección en una lista de mapas
-    List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs
-        .map((doc) => doc.data() as Map<String, dynamic>)
-        .toList();
+    if (seccionesSnapshot.docs.isEmpty) {
+      print('No se encontraron secciones.');
+    } else {
+      // Convertir los documentos de la subcolección en una lista de mapas
+      List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs.map((doc) {
+        //print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
+        //print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
+        return doc.data() as Map<String, dynamic>;
+      }).toList();
 
-    // Actualizar el estado con los datos de las secciones
-    setState(() {
-      _seccionData = seccionesData;
-    });
+      // Actualizar el estado con los datos de las secciones
+      setState(() {
+        _seccionData = seccionesData;
+      });
 
-    print('Secciones Data: $_seccionData');
+      //print('Secciones Data: $_seccionData'); //AQUI IMPRIME LO QUE SON DENTRO DE LOS CAMPOS QUE HAY DENTRO
+    }
   } catch (e) {
     print('Error fetching data: $e');
   }
