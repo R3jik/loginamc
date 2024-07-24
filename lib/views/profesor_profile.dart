@@ -199,6 +199,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
   String hora = _selectedAsistencia!['hora'] ?? '';
 
   // Obtener el nombre del profesor
+  // ignore: unused_local_variable
   String profesorId = FirebaseAuth.instance.currentUser!.uid;
   DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
       .collection('PROFESORES')

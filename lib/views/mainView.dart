@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/seccionesProfesoresView.dart';
+import 'package:loginamc/zeos/ViewSecret.dart';
 
 
 
@@ -23,6 +24,41 @@ class Mainview extends StatefulWidget {
 }
 
 class _MainviewState extends State<Mainview> {
+  int _tapCount = 0;
+DateTime? _lastTapTime;
+
+void _handleTap() {
+  final now = DateTime.now();
+  if (_lastTapTime == null || now.difference(_lastTapTime!) > Duration(seconds: 4)) {
+    _tapCount = 1;
+  } else {
+    _tapCount++;
+  }
+  _lastTapTime = now;
+
+  if (_tapCount == 5) {
+    _showSecretViewMessage();
+    _tapCount = 0;
+  }
+}
+
+void _showSecretViewMessage() {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('¡Vista secreta activada!', style: TextStyle(fontSize: 17),),
+      duration: Duration(seconds: 2),
+      action: SnackBarAction(
+        label: 'Abrir',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SecretView()),
+          );
+        },
+      ),
+    ),
+  );
+}
   Future<Map<String, dynamic>> getUserInfo() async {
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get(); //Cambiar la terminación .uid por .dni que pide el AppUser
     return userDoc.data() as Map<String, dynamic>;
@@ -90,13 +126,18 @@ class _MainviewState extends State<Mainview> {
                       }
                     },
                   ),
-                  SizedBox(
-                      width: screenWidth * 0.1,
-                      height: screenWidth * 0.1,
-                      child: Image.asset(
-                        'assets/images/Insignia_AMC.png',
-                      ),
+                  GestureDetector(
+                  onTap: () {
+                    _handleTap();
+                  },
+                  child: SizedBox(
+                    width: screenWidth * 0.1,
+                    height: screenWidth * 0.1,
+                    child: Image.asset(
+                      'assets/images/Insignia_AMC.png',
                     ),
+                  ),
+                ),
                 ],
               ),
             ),
@@ -127,7 +168,7 @@ class _MainviewState extends State<Mainview> {
                         future: getGrados(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
-                            return Text(" ");
+                            return const Text(" ");
                           } else if (snapshot.hasError) {
                             return Center(child: Text('Error: ${snapshot.error}'));
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
@@ -142,7 +183,7 @@ class _MainviewState extends State<Mainview> {
                                 mainAxisSpacing: 20,
                               ),
                               itemCount: grados.length,
-                              padding: const EdgeInsets.all(10),
+                              padding: const EdgeInsets.all(20),
                               itemBuilder: (context, index) {
                                 return GestureDetector(
                                   onTap: () {

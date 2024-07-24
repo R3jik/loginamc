@@ -17,11 +17,14 @@ class SeccionesProfesoresPage extends StatelessWidget {
   final String gradoNombre;
 
   SeccionesProfesoresPage({required this.profesorUid, required this.gradoId, required this.gradoNombre});
+  
 
   Future<Map<String, dynamic>> getUserInfo() async {
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid).get();
     return userDoc.data() as Map<String, dynamic>;
   }
+
+  
   Future<List<Map<String, dynamic>>> getSecciones(String profesorUid, String gradoId) async {
   try {
     // Obtiene el documento del profesor
@@ -70,6 +73,8 @@ class SeccionesProfesoresPage extends StatelessWidget {
     print('Error al obtener secciones: $e');
     return []; // Retorna una lista vacía en caso de error
   }
+
+  
 }
 
 

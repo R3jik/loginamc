@@ -28,6 +28,7 @@ class _BuscarViewState extends State<BuscarView> {
   List<Map<String, dynamic>> _alumnas = [];
   List<Map<String, dynamic>> _filteredAlumnas = [];
   bool _isLoading = true;
+  // ignore: unused_field
   bool _isSortedByName = true;
 
   @override
