@@ -122,6 +122,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
   final tz.TZDateTime now = TimeZoneHelper.nowInLima();
   final String fecha = DateFormat('dd-MM-yyyy').format(now);
   final String hora = DateFormat('HH:mm:ss').format(now);
+  // ignore: unused_local_variable
   final Timestamp timestamp = Timestamp.fromDate(now);
 
   // Referencia al documento del profesor
