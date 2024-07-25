@@ -17,11 +17,14 @@ class SeccionesProfesoresPage extends StatelessWidget {
   final String gradoNombre;
 
   SeccionesProfesoresPage({required this.profesorUid, required this.gradoId, required this.gradoNombre});
+  
 
   Future<Map<String, dynamic>> getUserInfo() async {
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid).get();
     return userDoc.data() as Map<String, dynamic>;
   }
+
+  
   Future<List<Map<String, dynamic>>> getSecciones(String profesorUid, String gradoId) async {
   try {
     // Obtiene el documento del profesor
@@ -70,6 +73,8 @@ class SeccionesProfesoresPage extends StatelessWidget {
     print('Error al obtener secciones: $e');
     return []; // Retorna una lista vacía en caso de error
   }
+
+  
 }
 
 
@@ -99,7 +104,7 @@ class SeccionesProfesoresPage extends StatelessWidget {
             Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
+                padding: EdgeInsets.all(screenWidth*0.05),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -121,18 +126,23 @@ class SeccionesProfesoresPage extends StatelessWidget {
                         }
                       },
                     ),
-                    Image(image: const AssetImage('assets/images/Insignia_AMC.png'),
-                    width: screenWidth*0.1,
-                    height: screenHeight*0.1,)
+                    SizedBox(
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
+                      child: Image.asset(
+                        'assets/images/Insignia_AMC.png',
+                      ),
+                    ),
                   ],
                 ),
               )
             ),
             Positioned(
-              bottom: 0,
+              
+              bottom: screenHeight*0.08,
             child: Container(
               width: screenWidth,
-                height: screenHeight*0.82,
+                height: screenHeight*0.8,
                 decoration: BoxDecoration(
                   color: fondo2,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(50))

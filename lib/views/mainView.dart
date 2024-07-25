@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/seccionesProfesoresView.dart';
+import 'package:loginamc/zeos/ViewSecret.dart';
 
 
 
@@ -23,6 +24,41 @@ class Mainview extends StatefulWidget {
 }
 
 class _MainviewState extends State<Mainview> {
+  int _tapCount = 0;
+DateTime? _lastTapTime;
+
+void _handleTap() {
+  final now = DateTime.now();
+  if (_lastTapTime == null || now.difference(_lastTapTime!) > Duration(seconds: 4)) {
+    _tapCount = 1;
+  } else {
+    _tapCount++;
+  }
+  _lastTapTime = now;
+
+  if (_tapCount == 5) {
+    _showSecretViewMessage();
+    _tapCount = 0;
+  }
+}
+
+void _showSecretViewMessage() {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text('¡Vista secreta activada!', style: TextStyle(fontSize: 17),),
+      duration: Duration(seconds: 2),
+      action: SnackBarAction(
+        label: 'Abrir',
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SecretView()),
+          );
+        },
+      ),
+    ),
+  );
+}
   Future<Map<String, dynamic>> getUserInfo() async {
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get(); //Cambiar la terminación .uid por .dni que pide el AppUser
     return userDoc.data() as Map<String, dynamic>;
@@ -72,7 +108,7 @@ class _MainviewState extends State<Mainview> {
             Align(
             alignment: Alignment.topLeft,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
+              padding: EdgeInsets.all(screenWidth*0.05),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -90,11 +126,18 @@ class _MainviewState extends State<Mainview> {
                       }
                     },
                   ),
-                  Image(
-                    image: const AssetImage('assets/images/Insignia_AMC.png'),
-                    width: screenWidth*0.1,
-                    height: screenHeight*0.1,
-                  )
+                  GestureDetector(
+                  onTap: () {
+                    _handleTap();
+                  },
+                  child: SizedBox(
+                    width: screenWidth * 0.1,
+                    height: screenWidth * 0.1,
+                    child: Image.asset(
+                      'assets/images/Insignia_AMC.png',
+                    ),
+                  ),
+                ),
                 ],
               ),
             ),
@@ -103,7 +146,7 @@ class _MainviewState extends State<Mainview> {
             bottom: 0,
             child: Container(
               width: screenWidth,
-              height: screenHeight * 0.72,
+              height: screenHeight * 0.8,
               decoration: BoxDecoration(
                 color: fondo2,
                 borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))
@@ -120,48 +163,52 @@ class _MainviewState extends State<Mainview> {
                       ],
                     ),
                   ),
-                  Container(
-                    width: screenWidth*0.9,
-                    height: screenHeight*0.6,
-                    child: FutureBuilder<List<Map<String, dynamic>>>(
-                      future: getGrados(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return const Center(child: Text('No tienes grados asignados'));
-                        } else {
-                          List<Map<String, dynamic>> grados = snapshot.data!;
-                          return GridView.builder(
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.9,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 20,
-                            ),
-                          itemCount: grados.length,
-                          padding: const EdgeInsets.all(10),
-                          itemBuilder: (context, index) {
-                          return GestureDetector(
-                          onTap: () {
-                            Navigator.push(context,MaterialPageRoute(builder: (context) => SeccionesProfesoresPage(profesorUid: widget.user.dni,gradoId: grados[index]['id'],gradoNombre: grados[index]['nombre'],
-                        ),
-                      ),
-                    );
-                                    },
-                                    child: GradoCard(
-                                      numero: grados[index]['numero'],
-                                      nombre: grados[index]['nombre'],
-                                    ),
-                                  );
+                  Expanded(
+                      child: FutureBuilder<List<Map<String, dynamic>>>(
+                        future: getGrados(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Text(" ");
+                          } else if (snapshot.hasError) {
+                            return Center(child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return const Center(child: Text('No tienes grados asignados'));
+                          } else {
+                            List<Map<String, dynamic>> grados = snapshot.data!;
+                            return GridView.builder(
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.9,
+                                crossAxisSpacing: 10,
+                                mainAxisSpacing: 20,
+                              ),
+                              itemCount: grados.length,
+                              padding: const EdgeInsets.all(20),
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => SeccionesProfesoresPage(
+                                          profesorUid: widget.user.dni,gradoId: 
+                                          grados[index]['id'],
+                                          gradoNombre: grados[index]['nombre']
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: GradoCard(
+                                    numero: grados[index]['numero'],
+                                    nombre: grados[index]['nombre'],
+                                  ),
+                                );
                               },
                             );
                           }
                         },
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
