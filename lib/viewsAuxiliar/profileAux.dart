@@ -15,16 +15,16 @@ import 'package:loginamc/helpers/timezone_helper.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfesorProfile extends StatefulWidget {
+class ProfileAux extends StatefulWidget {
   final AppUser profesorId;
 
-  const ProfesorProfile({Key? key, required this.profesorId}) : super(key: key);
+  const ProfileAux({Key? key, required this.profesorId}) : super(key: key);
 
   @override
-  _ProfesorProfileState createState() => _ProfesorProfileState();
+  _ProfileAuxState createState() => _ProfileAuxState();
 }
 
-class _ProfesorProfileState extends State<ProfesorProfile> {
+class _ProfileAuxState extends State<ProfileAux> {
   Map<String, dynamic>? _profesorData;
   // ignore: unused_field
   String _currentDate = '';
