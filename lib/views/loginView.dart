@@ -37,6 +37,13 @@ class _LoginPageState extends State<LoginPage> {
           password: _passwordController.text,
         );
         User user = userCredential.user!;
+
+        await FirebaseFirestore.instance
+          .collection('USUARIOS')
+          .doc(user.uid)
+          .update({'isConnected': true});
+
+
         await _redirectUserBasedOnRole(user);
       } on FirebaseAuthException catch (e) {
         setState(() {
@@ -77,6 +84,7 @@ class _LoginPageState extends State<LoginPage> {
         String dni = userDoc.get('dni').toString();
         AppUser appUser = AppUser(dni: dni);
 
+        
         if (role == 'PROFESOR') {
           Navigator.pushReplacement(
             context,
@@ -99,8 +107,12 @@ class _LoginPageState extends State<LoginPage> {
           _errorMessage = 'Usuario no registrado';
         });
       }
+
+      
     
   }
+
+  
 
   @override
   Widget build(BuildContext context) {

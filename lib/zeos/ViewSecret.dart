@@ -52,7 +52,7 @@ class _SecretViewState extends State<SecretView> with SingleTickerProviderStateM
           const SizedBox(height: 20),
           const Center(
             child: const Text(
-              'Developers - R3jick and Lil Deus',
+              'Developers - R3jik and Lil Deus',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 16,

@@ -1,14 +1,21 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:loginamc/Admin/connection_aware_widget.dart';
 import 'package:loginamc/views/bienvenidaView.dart';
+import 'api/apifirebase.dart';
 import 'firebase_options.dart';
 import 'package:loginamc/helpers/timezone_helper.dart';
+
+// final navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
+  await FirebaseApi().initNotifications();
+  await FirebaseMessaging.instance.subscribeToTopic('all');
   TimeZoneHelper.initializeTimeZones();
   runApp(const MainApp());
 }
@@ -18,13 +25,17 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return  MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          useMaterial3: true,
-          colorSchemeSeed: const Color(0XFF001220),
+    return  ConnectionAwareWidget(
+      child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            useMaterial3: true,
+            colorSchemeSeed: const Color(0XFF001220),
+          ),
+          home: const Bienvenidaview(),
+          // navigatorKey: navigatorKey,
+          
         ),
-        home: const Bienvenidaview(),
-      );
+    );
   }
 }
