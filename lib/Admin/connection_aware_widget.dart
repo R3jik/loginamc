@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,17 +14,21 @@ class ConnectionAwareWidget extends StatefulWidget {
 }
 
 class _ConnectionAwareWidgetState extends State<ConnectionAwareWidget> with WidgetsBindingObserver {
+  bool isConnected = true;
+  Timer? _inactivityTimer;
+  static const inactivityTimeout = Duration(seconds: 20); // Adjust as needed
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _updateConnectionStatus(true);
+    _startInactivityTimer();
   }
 
   @override
   void dispose() {
+    _inactivityTimer?.cancel();
     WidgetsBinding.instance.removeObserver(this);
-    _updateConnectionStatus(false);
     super.dispose();
   }
 
@@ -32,7 +38,25 @@ class _ConnectionAwareWidgetState extends State<ConnectionAwareWidget> with Widg
       _updateConnectionStatus(false);
     } else if (state == AppLifecycleState.resumed) {
       _updateConnectionStatus(true);
+      _startInactivityTimer(); // Restart timer on app resume
     }
+  }
+
+  _startInactivityTimer() {
+  print('Starting inactivity timer');
+  _inactivityTimer = Timer(inactivityTimeout, () {
+    print('Inactivity timeout reached');
+    setState(() {
+      isConnected = false;
+    });
+    _updateConnectionStatus(false);
+  });
+}
+
+
+  void _resetInactivityTimer() {
+    _inactivityTimer?.cancel();
+    _startInactivityTimer();
   }
 
   Future<void> _updateConnectionStatus(bool isConnected) async {
@@ -47,6 +71,10 @@ class _ConnectionAwareWidgetState extends State<ConnectionAwareWidget> with Widg
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    // Add GestureDetector or other interaction listeners to reset the timer
+    return GestureDetector(
+      onTap: _resetInactivityTimer,
+      child: widget.child,
+    );
   }
 }
