@@ -33,7 +33,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const Bienvenidaview()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Bienvenidaview()));
                 },
                 child: const Text('OK'),
               ),

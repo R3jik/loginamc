@@ -294,7 +294,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
     if (bytes.isNotEmpty) {
       await Printing.sharePdf(
         bytes: bytes,
-        filename: 'reporte_asistencia_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}_$cursoId.pdf',
+        filename: 'reporte_asistencia_${DateFormat('yyyyMMdd_HHmm').format(DateTime.now())}_$cursoId''_$seccionId.pdf',
       );
       print('PDF compartido exitosamente');
     } else {

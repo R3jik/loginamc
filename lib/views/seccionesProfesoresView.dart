@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/listaView.dart';
+import 'package:loginamc/views/loginView.dart';
 
 
 
@@ -12,7 +14,7 @@ Color whiteColor = const Color(0XFFF6F6F6);
 
 
 class SeccionesProfesoresPage extends StatelessWidget {
-  final String profesorUid;
+  final AppUser profesorUid;
   final String gradoId;
   final String gradoNombre;
 
@@ -20,15 +22,15 @@ class SeccionesProfesoresPage extends StatelessWidget {
   
 
   Future<Map<String, dynamic>> getUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid).get();
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid.dni).get();
     return userDoc.data() as Map<String, dynamic>;
   }
 
   
-  Future<List<Map<String, dynamic>>> getSecciones(String profesorUid, String gradoId) async {
+  Future<List<Map<String, dynamic>>> getSecciones(AppUser profesorUid, String gradoId) async {
   try {
     // Obtiene el documento del profesor
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid).get();
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid.dni).get();
     
     // Verifica si el documento existe y extrae la lista de secciones
     if (!userDoc.exists) {
@@ -38,7 +40,7 @@ class SeccionesProfesoresPage extends StatelessWidget {
     // Obtiene los IDs de secciones desde la subcolección SECCIONES
     QuerySnapshot seccionesSnapshot = await FirebaseFirestore.instance
         .collection('PROFESORES')
-        .doc(profesorUid)
+        .doc(profesorUid.dni)
         .collection('SECCIONES')
         .get();
 
@@ -188,7 +190,7 @@ class SeccionesProfesoresPage extends StatelessWidget {
                           itemBuilder: (context, index) {
                           return GestureDetector(
                           onTap: () {
-                            Navigator.push(context,MaterialPageRoute(builder: (context) =>  AsistenciaView(seccionId: secciones[index]['id'],seccionNombre: secciones[index]['letra'], gradoNombre: gradoNombre, profesorId: profesorUid,),
+                            Navigator.push(context,MaterialPageRoute(builder: (context) =>  AsistenciaView(seccionId: secciones[index]['id'],seccionNombre: secciones[index]['letra'], gradoNombre: gradoNombre, profesorId: profesorUid.dni,),
                       ),
                     );
                                     },
@@ -208,7 +210,6 @@ class SeccionesProfesoresPage extends StatelessWidget {
           ),
           ],
         ),
-        
       ),
     );
   }

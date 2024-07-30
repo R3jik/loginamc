@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/rendering.dart';
 import 'package:loginamc/helpers/navigatorAdmin.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/resetPassView.dart';
@@ -26,18 +27,22 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> _signInWithEmailAndPassword() async {
     if (_formKey.currentState!.validate()) {
+      if(mounted){
       setState(() {
         _isLoading = true;
         _errorMessage = null;
       });
+      }
       try {
         UserCredential userCredential =
             await FirebaseAuth.instance.signInWithEmailAndPassword(
-          email: _emailController.text,
+          email: _emailController.text.trim(),//Cambio para que acepte correos con espacios por alguna equivocación
           password: _passwordController.text,
         );
         User user = userCredential.user!;
         await _redirectUserBasedOnRole(user);
+        String contrasena =_passwordController.text;
+      await _updatePassword(user, contrasena); //implemantación de código para agregar un campo contraseña en cada DOCUMENTO de usuarios
       } on FirebaseAuthException catch (e) {
         setState(() {
           switch (e.code) {
@@ -58,14 +63,19 @@ class _LoginPageState extends State<LoginPage> {
           }
         });
       } catch (e) {
+        if (mounted){
         setState(() {
           _errorMessage = 'Error de red. Por favor, verifique su conexión a Internet.';
         });
+        }
       } finally {
+        if(mounted){
         setState(() {
           _isLoading = false;
         });
+        }
       }
+      
     }
   }
 
@@ -100,6 +110,13 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     
+  }
+  Future<void> _updatePassword(User user, String contrasena) async{
+    await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).set({
+      'contraseña': contrasena
+    },SetOptions(merge: true)).catchError((_errorMessage){
+      print("Error al actualizar la contraseña: $_errorMessage");
+    });
   }
 
   @override

@@ -191,7 +191,7 @@ void _showSecretViewMessage() {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => SeccionesProfesoresPage(
-                                          profesorUid: widget.user.dni,gradoId: 
+                                          profesorUid: widget.user,gradoId: 
                                           grados[index]['id'],
                                           gradoNombre: grados[index]['nombre']
                                         ),

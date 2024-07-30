@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // ignore: must_be_immutable
 class DetalleAlumnaView extends StatefulWidget {
@@ -27,12 +28,14 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
   bool _isLoading = true;
   String _grado = '';
   String _seccion = '';
+  String _celular = "";
 
   @override
   void initState() {
     super.initState();
     _fetchAsistencias();
     _fetchGradoSeccion();
+    _fetchCellular();
     tz.initializeTimeZones();
   }
 
@@ -174,7 +177,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
         String seccionId = data['seccionId'] ?? '';
         if (seccionId.isNotEmpty) {
           // Separar grado y sección
-          _grado = seccionId.substring(0, seccionId.length - 1);
+          _grado = seccionId.substring(1, seccionId.length - 1);
           _seccion = seccionId.substring(seccionId.length - 1);
           setState(() {});
         }
@@ -270,132 +273,142 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
       print('Error eliminando todas las asistencias: $e');
     }
   }
+  Future<String> _searchCelular(String alumnaId) async {
+    
+    try {
+      DocumentSnapshot docSnapshot =
+          await FirebaseFirestore.instance.collection('ALUMNAS').doc(alumnaId).get();
+      if (docSnapshot.exists) {
+        var data = docSnapshot.data() as Map<String, dynamic>;
+        String celular =data["celular_apoderado"];
+        return celular;
+      } else {
+        return 'No registrado';
+      }
+    } catch (e) {
+      return 'No registrado';
+    }
+  }
+  Future<void> _fetchCellular() async {
+    String celular = await _searchCelular(widget.alumna['id']);
+    setState(() {
+      _celular = celular;
+      print('Celular encontrado: $_celular');
+    });
+  }
+
+  Future<void> _makeCall() async {
+    if (_celular.isNotEmpty && _celular != 'No registrado') {
+      final Uri launchUri = Uri(
+        scheme: 'tel',
+        path: '+51$_celular',
+      );
+      if(await canLaunchUrl(launchUri)){
+        await launchUrl(launchUri);
+      } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("No se puede realizar la llamada")),
+      );
+    }
+    }
+  }
+  Future<void> _launchInBrowser() async {
+    if (_celular.isNotEmpty && _celular != 'No registrado') {
+    final Uri whatsappUrl = Uri(
+      scheme: 'https',
+      host: 'wa.me',
+      path: '51$_celular'
+    );
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(whatsappUrl,mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("WhatsApp no está instalado")),
+      );
+    }
+  }
+  }
+
+  Future<void> _openWhatsApp()async{
+    if (_celular.isNotEmpty && _celular != 'No registrado') {
+    final Uri whatsappUrl = Uri.parse('whatsapp://send?+51$_celular');
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(whatsappUrl,mode: LaunchMode.externalApplication);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("WhatsApp no está instalado")),
+      );
+    }
+  }
+  }
 
   @override
 Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: const Color(0XFF071E30),
-    body: _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                    Container(
-                      alignment: const Alignment(0, 0),
-                      height: 80,
-                      decoration: BoxDecoration(
-                        color: const Color(0XFF001220),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.16),
-                            spreadRadius: 3,
-                            blurRadius: 10,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
+  return SafeArea(
+    child: Scaffold(
+      backgroundColor: const Color(0XFF071E30),
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 10),
+                      Container(
+                        alignment: const Alignment(0, 0),
+                        height: 80,
+                        decoration: BoxDecoration(
+                          color: const Color(0XFF001220),
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.16),
+                              spreadRadius: 3,
+                              blurRadius: 10,
+                              offset: const Offset(0, 3),
+                            ),
+                          ],
+                        ),
+                        child: const Text(
+                          "DETALLES DE ASISTENCIA",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      child: const Text(
-                        "DETALLES DE ASISTENCIA",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-
-                    //AQUI VA EL CONTAINER
-                    Container(
-                      height: 200,
-                      width: 500,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0XFF001220),
-                                borderRadius: BorderRadius.circular(16),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.16),
-                                    spreadRadius: 3,
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 3),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 10),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(5),
-                                        width: 400,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFD3E5FF),
-                                          borderRadius: BorderRadius.circular(16),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.16),
-                                              spreadRadius: 3,
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            '${widget.alumna['nombre']} ',
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87),
-                                          ),
-                                        ),
-                                      ),
+                      const SizedBox(height: 15),
+    
+                      //AQUI VA EL CONTAINER
+                      Container(
+                        height: 200,
+                        width: 500,
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: const Color(0XFF001220),
+                                  borderRadius: BorderRadius.circular(16),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.16),
+                                      spreadRadius: 3,
+                                      blurRadius: 10,
+                                      offset: const Offset(0, 3),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(bottom: 10, top: 10),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(5),
-                                        width: 400,
-                                        decoration: BoxDecoration(
-                                          color: const Color(0xFFD3E5FF),
-                                          borderRadius: BorderRadius.circular(16),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black.withOpacity(0.16),
-                                              spreadRadius: 3,
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 3),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(left: 10),
-                                          child: Text(
-                                            '${widget.alumna['apellido_paterno']} ',
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black87),
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(top: 10),
+                                  ],
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10),
                                         child: Container(
                                           padding: const EdgeInsets.all(5),
                                           width: 400,
@@ -414,7 +427,7 @@ Widget build(BuildContext context) {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${widget.alumna['apellido_materno']}',
+                                              '${widget.alumna['nombre']} ',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -423,92 +436,177 @@ Widget build(BuildContext context) {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 10, top: 10),
+                                        child: Container(
+                                          padding: const EdgeInsets.all(5),
+                                          width: 400,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFD3E5FF),
+                                            borderRadius: BorderRadius.circular(16),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withOpacity(0.16),
+                                                spreadRadius: 3,
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(left: 10),
+                                            child: Text(
+                                              '${widget.alumna['apellido_paterno']} ',
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Container(
+                                            padding: const EdgeInsets.all(5),
+                                            width: 400,
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFD3E5FF),
+                                              borderRadius: BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withOpacity(0.16),
+                                                  spreadRadius: 3,
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 3),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(left: 10),
+                                              child: Text(
+                                                '${widget.alumna['apellido_materno']}',
+                                                style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black87),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Column(
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: const Color(0XFF001220),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.16),
-                                      spreadRadius: 3,
-                                      blurRadius: 10,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                width: 200,
-                                height: 200,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.person_3,
-                                      color: Colors.blue,
-                                      size: 150,
-                                    ),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Text("GRADO: $_grado", style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
-                                      const SizedBox(width: 10,),
-                                      Text("SECCION: $_seccion", style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
+                            const SizedBox(
+                              width: 10,
+                            ),
+                            Column(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: const Color(0XFF001220),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.16),
+                                        spreadRadius: 3,
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 3),
+                                      ),
                                     ],
-                                    ),
-                                  ],
+                                  ),
+                                  width: 200,
+                                  height: 200,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      
+                                      const Icon(
+                                        Icons.person_3,
+                                        color: Colors.blue,
+                                        size: 150,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: [
+                                        Text("GRADO: $_grado", style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
+                                        const SizedBox(width: 10,),
+                                        Text("SECCION: $_seccion", style: const TextStyle(color: Colors.white,fontWeight: FontWeight.bold,),),
+                                      ],
+                                      ),
+                                    ],
+                                  ),
+                                  
                                 ),
                                 
-                              ),
-                              
-                            ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      if(_celular.isNotEmpty && _celular != "No registrado")
+                        Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: Center(
+                            child: Row(
+                      children: [
+                        ElevatedButton(
+                          onPressed: _eliminarTodasAsistencias,
+                          child: Text('Eliminar todas las asistencias'),
+                        ),
+                        /*const SizedBox(width: 5),
+                        IconButton(
+                          icon: const Icon(Icons.chat),
+                          onPressed: _openWhatsApp,
+                          color: Colors.yellow,
+                        ),*/
+                        const SizedBox(width: 5),
+                        IconButton(
+                          icon: const Icon(Icons.call),
+                          onPressed: _makeCall,
+                          color: Colors.green,
+                        ),
+                      ],
+                    ),),
+                          )
+                      else
+                      Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Center(
+                          child: ElevatedButton(
+                            onPressed: _eliminarTodasAsistencias,
+                            child: Text('Eliminar todas las asistencias'),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
-                  
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Center(
-                      child: ElevatedButton(
-                        onPressed: _eliminarTodasAsistencias,
-                        child: Text('Eliminar todas las asistencias'),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                    const Text('ESTADISTICAS TOTALES',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white)),
-                  // Text(
-                  //   '${widget.alumna['nombre']} ${widget.alumna['apellido_paterno']} ${widget.alumna['apellido_materno']}',
-                  //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  // ),
-                  // SizedBox(height: 8),
-                  // Text('Grado: $_grado'),
-                  // Text('Sección: $_seccion'),
-                  // SizedBox(height: 16),
-                  
-                  const SizedBox(height: 10),
-                  _buildAsistenciasList('Tardanzas', _tardanzas),
-                  _buildAsistenciasList('Faltas', _faltas),
-                  _buildAsistenciasList('Justificaciones', _justificaciones),
-                ],
+                      const Text('ESTADISTICAS TOTALES',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
+                    // Text(
+                    //   '${widget.alumna['nombre']} ${widget.alumna['apellido_paterno']} ${widget.alumna['apellido_materno']}',
+                    //   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    // ),
+                    // SizedBox(height: 8),
+                    // Text('Grado: $_grado'),
+                    // Text('Sección: $_seccion'),
+                    // SizedBox(height: 16),
+                    
+                    const SizedBox(height: 10),
+                    _buildAsistenciasList('Tardanzas', _tardanzas),
+                    _buildAsistenciasList('Faltas', _faltas),
+                    _buildAsistenciasList('Justificaciones', _justificaciones),
+                  ],
+                ),
               ),
             ),
-          ),
+    ),
   );
 }
 

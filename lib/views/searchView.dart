@@ -145,7 +145,7 @@ class _BuscarViewState extends State<BuscarView> {
 
   void _sortByDate() {
     setState(() {
-      DateFormat dateFormat = DateFormat('d/M/yyyy');
+      DateFormat dateFormat = DateFormat('dd/MM/yyyy');
       _filteredAlumnas.sort((a, b) {
         DateTime dateA = dateFormat.parse(a['fecha']);
         DateTime dateB = dateFormat.parse(b['fecha']);

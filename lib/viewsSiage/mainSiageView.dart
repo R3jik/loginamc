@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/viewsSiage/createUsers.dart';
+import 'package:loginamc/viewsSiage/deleteUsers.dart';
 import 'package:loginamc/viewsSiage/updateAlumnas.dart';
 import 'package:loginamc/viewsSiage/updateSecciones.dart';
 import 'package:loginamc/viewsSiage/updateProfesores.dart';
@@ -140,6 +141,17 @@ class MainSiageView extends StatelessWidget {
                           ),
                           onTap: (){
                             //Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPageAlumna()));
+                          },
+                        ),
+                        SizedBox(height: separacionCards),
+                        GestureDetector(
+                          child: Container(
+                                      height: heightCards,
+                                      width: widthCards,
+                                      child: CardSubirDatos(texto: "Eliminar Datos de los Usuarios",),
+                          ),
+                          onTap: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => DeletePageUsuarios()));
                           },
                         ),
                       ],
