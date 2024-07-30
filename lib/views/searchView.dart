@@ -144,16 +144,31 @@ class _BuscarViewState extends State<BuscarView> {
   }
 
   void _sortByDate() {
-    setState(() {
-      DateFormat dateFormat = DateFormat('dd/MM/yyyy');
-      _filteredAlumnas.sort((a, b) {
-        DateTime dateA = dateFormat.parse(a['fecha']);
-        DateTime dateB = dateFormat.parse(b['fecha']);
-        return dateB.compareTo(dateA);
-      });
-      _isSortedByName = false;
+  setState(() {
+    _filteredAlumnas.sort((a, b) {
+      DateTime? dateA = _parseDate(a['fecha']);
+      DateTime? dateB = _parseDate(b['fecha']);
+      if (dateA == null && dateB == null) return 0;
+      if (dateA == null) return 1;
+      if (dateB == null) return -1;
+      return dateB.compareTo(dateA);
     });
+    _isSortedByName = false;
+  });
+}
+
+DateTime? _parseDate(String dateStr) {
+  List<String> formats = ['dd-MM-yyyy', 'd/M/yyyy', 'dd/MM/yyyy', 'yyyy-MM-dd'];
+  for (String format in formats) {
+    try {
+      return DateFormat(format).parse(dateStr);
+    } catch (_) {
+      // Si falla, intenta con el siguiente formato
+    }
   }
+  print('No se pudo parsear la fecha: $dateStr');
+  return null;
+}
 
   void _debouncedSearch(String query) {
     setState(() {

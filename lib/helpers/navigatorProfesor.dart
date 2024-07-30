@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
+import 'package:loginamc/Admin/admin.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/profesor_profile.dart';
@@ -29,6 +30,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
       Mainview(user: widget.user),     
       BuscarView(user: widget.user),
       ProfesorProfile(profesorId: widget.user),
+      AdminPanel(user: widget.user),
     ];
   }
   
@@ -70,6 +72,10 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
               GButton(
                 icon: Icons.person_pin,
                 text: "Perfil",
+              ),
+              GButton(
+                icon: Icons.person_pin,
+                text: "Admin",
               ),
             ],
             selectedIndex: _selectedIndex,

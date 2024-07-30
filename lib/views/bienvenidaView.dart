@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 
 
 class Bienvenidaview extends StatelessWidget {
+  
   const Bienvenidaview({super.key});
 
   @override
   Widget build(BuildContext context) {
+    
     //trae el tamaño de la pantalla del dispositivo
     final screenSize = MediaQuery.of(context).size;
     //aplica variable de ancho

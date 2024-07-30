@@ -40,6 +40,13 @@ class _LoginPageState extends State<LoginPage> {
           password: _passwordController.text,
         );
         User user = userCredential.user!;
+
+        await FirebaseFirestore.instance
+          .collection('USUARIOS')
+          .doc(user.uid)
+          .update({'isConnected': true});
+
+
         await _redirectUserBasedOnRole(user);
         String contrasena =_passwordController.text;
       await _updatePassword(user, contrasena); //implemantación de código para agregar un campo contraseña en cada DOCUMENTO de usuarios
@@ -87,6 +94,7 @@ class _LoginPageState extends State<LoginPage> {
         String dni = userDoc.get('dni').toString();
         AppUser appUser = AppUser(dni: dni);
 
+        
         if (role == 'PROFESOR') {
           Navigator.pushReplacement(
             context,
@@ -109,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
           _errorMessage = 'Usuario no registrado';
         });
       }
+
+      
     
   }
   Future<void> _updatePassword(User user, String contrasena) async{
@@ -118,6 +128,8 @@ class _LoginPageState extends State<LoginPage> {
       print("Error al actualizar la contraseña: $_errorMessage");
     });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {

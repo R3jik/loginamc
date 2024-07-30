@@ -116,7 +116,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
                   DateTime fechaHora = DateTime.parse('$fechaFormatted $asistenciaHora');
                   
                   // Ajustar a hora de Lima (UTC-5)
-                  fechaHora = fechaHora.subtract(Duration(hours: 5));
+                  fechaHora = fechaHora.subtract(Duration(hours: 0));
                   data['fechaHora'] = DateFormat('dd-MM-yyyy HH:mm').format(fechaHora);
                 } else {
                   data['fechaHora'] = 'Formato de fecha inválido';
@@ -166,26 +166,28 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 }
 
   Future<void> _fetchGradoSeccion() async {
-    try {
-      DocumentSnapshot alumnaDoc = await FirebaseFirestore.instance
-          .collection('ALUMNAS')
-          .doc(widget.alumna['id'])
-          .get();
+  try {
+    DocumentSnapshot alumnaDoc = await FirebaseFirestore.instance
+        .collection('ALUMNAS')
+        .doc(widget.alumna['id'])
+        .get();
 
-      if (alumnaDoc.exists) {
-        var data = alumnaDoc.data() as Map<String, dynamic>;
-        String seccionId = data['seccionId'] ?? '';
-        if (seccionId.isNotEmpty) {
-          // Separar grado y sección
-          _grado = seccionId.substring(1, seccionId.length - 1);
-          _seccion = seccionId.substring(seccionId.length - 1);
-          setState(() {});
-        }
+    if (alumnaDoc.exists) {
+      var data = alumnaDoc.data() as Map<String, dynamic>;
+      String seccionId = data['seccionId'] ?? '';
+      if (seccionId.isNotEmpty && seccionId.length == 3) {
+        // Separar grado y sección
+        _grado = seccionId.substring(1, 2); // Extraer solo el número del grado
+        _seccion = seccionId.substring(2); // Extraer la última letra como sección
+        setState(() {});
       }
-    } catch (e) {
-      print('Error fetching grado y seccion: $e');
     }
+  } catch (e) {
+    print('Error fetching grado y seccion: $e');
   }
+}
+
+
 
   Future<void> _justificarAsistencia(String alumnoId, String profesorId, String asistenciaId) async {
     try {
