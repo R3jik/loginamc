@@ -209,7 +209,7 @@ DateTime? _parseDate(String dateStr) {
                   "BUSQUEDA DE ALUMNAS",
                   style: TextStyle(
                       color: Colors.white,
-                      fontSize: 28,
+                      fontSize: 26,
                       fontWeight: FontWeight.bold),
                 ),
               ),

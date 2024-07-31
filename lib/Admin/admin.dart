@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class AdminPanel extends StatefulWidget {
   final AppUser user;
@@ -20,9 +19,6 @@ class _AdminPanelState extends State<AdminPanel> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
-  final TextEditingController _notificationTitleController = TextEditingController();
-  final TextEditingController _notificationBodyController = TextEditingController();
-  File? _imageFile;
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -106,7 +102,6 @@ class _AdminPanelState extends State<AdminPanel> {
             ),
             SizedBox(height: 20),
 
-
             // Bloque de Registro de Cambios (Opcional)
             Text('Registro de Cambios', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             SizedBox(height: 10),
@@ -135,7 +130,6 @@ class _AdminPanelState extends State<AdminPanel> {
     );
   }
 
-  
   Future<void> _addUser() async {
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(

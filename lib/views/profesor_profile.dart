@@ -34,6 +34,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
   Map<String, dynamic>? _cursoData;
   List<Map<String, dynamic>> _asistencias = [];
   bool _isLoading = false;
+  bool _isFirstLoad = true;
   
 
   @override
@@ -45,6 +46,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
     _loadAsistencias().then((asistencias) {
       setState(() {
         _asistencias = asistencias;
+        _isFirstLoad = false;
       });
     });
   }
