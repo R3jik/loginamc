@@ -1,8 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:loginamc/Admin/connection_aware_widget.dart';
 import 'package:loginamc/views/bienvenidaView.dart';
+import 'Admin/connection_aware_widget.dart';
 import 'api/apifirebase.dart';
 import 'firebase_options.dart';
 import 'package:loginamc/helpers/timezone_helper.dart';
@@ -26,16 +26,17 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  ConnectionAwareWidget(
-      child: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            useMaterial3: true,
-            colorSchemeSeed: const Color(0XFF001220),
+      inactivitySeconds: 20,
+      child:  MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              useMaterial3: true,
+              colorSchemeSeed: const Color(0XFF001220),
+            ),
+            home: const Bienvenidaview(),
+            // navigatorKey: navigatorKey,
+            
           ),
-          home: const Bienvenidaview(),
-          // navigatorKey: navigatorKey,
-          
-        ),
-    );
+    ); 
   }
 }

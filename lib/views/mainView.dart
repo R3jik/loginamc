@@ -94,129 +94,129 @@ void _showSecretViewMessage() {
     );
 
     return SafeArea(
-      child: Scaffold(
-        body: Stack(
-          children: [
-            Positioned(
-              top: 0,
-              child:Container(
-                width: screenWidth,
-                height: screenHeight,
-                color: fondo1,
-              ) ,
-            ),
-            Align(
-            alignment: Alignment.topLeft,
-            child: Padding(
-              padding: EdgeInsets.all(screenWidth*0.05),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  FutureBuilder<Map<String, dynamic>>(
-                    future: getUserInfo(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}', style: texto,);
-                      } else {
-                        Map<String, dynamic> userInfo = snapshot.data!;
-                        String greeting = userInfo['genero'].toString().toUpperCase() == 'MASCULINO' ? 'Bienvenido' : 'Bienvenida';
-                        return Text('$greeting, ${userInfo['nombre']} ${userInfo['apellido_paterno']}',style:  texto,);
-                      }
+        child: Scaffold(
+          body: Stack(
+            children: [
+              Positioned(
+                top: 0,
+                child:Container(
+                  width: screenWidth,
+                  height: screenHeight,
+                  color: fondo1,
+                ) ,
+              ),
+              Align(
+              alignment: Alignment.topLeft,
+              child: Padding(
+                padding: EdgeInsets.all(screenWidth*0.05),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FutureBuilder<Map<String, dynamic>>(
+                      future: getUserInfo(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}', style: texto,);
+                        } else {
+                          Map<String, dynamic> userInfo = snapshot.data!;
+                          String greeting = userInfo['genero'].toString().toUpperCase() == 'MASCULINO' ? 'Bienvenido' : 'Bienvenida';
+                          return Text('$greeting, ${userInfo['nombre']} ${userInfo['apellido_paterno']}',style:  texto,);
+                        }
+                      },
+                    ),
+                    GestureDetector(
+                    onTap: () {
+                      _handleTap();
                     },
-                  ),
-                  GestureDetector(
-                  onTap: () {
-                    _handleTap();
-                  },
-                  child: SizedBox(
-                    width: screenWidth * 0.1,
-                    height: screenWidth * 0.1,
-                    child: Image.asset(
-                      'assets/images/Insignia_AMC.png',
-                    ),
-                  ),
-                ),
-                ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 0,
-            child: Container(
-              width: screenWidth,
-              height: screenHeight * 0.8,
-              decoration: BoxDecoration(
-                color: fondo2,
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))
-              ),
-              child:  Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_box, color: whiteText,size: 30 ,),
-                        const SizedBox(width: 5),
-                        Text("Seleccione el grado", style: texto,)
-                      ],
-                    ),
-                  ),
-                  Expanded(
-                      child: FutureBuilder<List<Map<String, dynamic>>>(
-                        future: getGrados(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Text(" ");
-                          } else if (snapshot.hasError) {
-                            return Center(child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return const Center(child: Text('No tienes grados asignados'));
-                          } else {
-                            List<Map<String, dynamic>> grados = snapshot.data!;
-                            return GridView.builder(
-                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                childAspectRatio: 0.9,
-                                crossAxisSpacing: 10,
-                                mainAxisSpacing: 20,
-                              ),
-                              itemCount: grados.length,
-                              padding: const EdgeInsets.all(20),
-                              itemBuilder: (context, index) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SeccionesProfesoresPage(
-                                          profesorUid: widget.user,gradoId: 
-                                          grados[index]['id'],
-                                          gradoNombre: grados[index]['nombre']
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: GradoCard(
-                                    numero: grados[index]['numero'],
-                                    nombre: grados[index]['nombre'],
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
+                    child: SizedBox(
+                      width: screenWidth * 0.1,
+                      height: screenWidth * 0.1,
+                      child: Image.asset(
+                        'assets/images/Insignia_AMC.png',
                       ),
                     ),
-                ],
+                  ),
+                  ],
+                ),
               ),
             ),
-          )
-          ],
+            Positioned(
+              bottom: 0,
+              child: Container(
+                width: screenWidth,
+                height: screenHeight * 0.8,
+                decoration: BoxDecoration(
+                  color: fondo2,
+                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))
+                ),
+                child:  Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_box, color: whiteText,size: 30 ,),
+                          const SizedBox(width: 5),
+                          Text("Seleccione el grado", style: texto,)
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                        child: FutureBuilder<List<Map<String, dynamic>>>(
+                          future: getGrados(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const Text(" ");
+                            } else if (snapshot.hasError) {
+                              return Center(child: Text('Error: ${snapshot.error}'));
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return const Center(child: Text('No tienes grados asignados'));
+                            } else {
+                              List<Map<String, dynamic>> grados = snapshot.data!;
+                              return GridView.builder(
+                                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.9,
+                                  crossAxisSpacing: 10,
+                                  mainAxisSpacing: 20,
+                                ),
+                                itemCount: grados.length,
+                                padding: const EdgeInsets.all(20),
+                                itemBuilder: (context, index) {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SeccionesProfesoresPage(
+                                            profesorUid: widget.user,gradoId: 
+                                            grados[index]['id'],
+                                            gradoNombre: grados[index]['nombre']
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: GradoCard(
+                                      numero: grados[index]['numero'],
+                                      nombre: grados[index]['nombre'],
+                                    ),
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            )
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 }
 

@@ -49,13 +49,10 @@ dependencies:
   shared_preferences: ^2.2.3
   flutter_speed_dial: ^7.0.0
   flutter_lints: ^3.0.0
-<<<<<<< HEAD
   url_launcher: ^6.3.0
-=======
   firebase_messaging:
   provider: 
   http: ^0.13.3
->>>>>>> 36f9086d65a90d1d6732bab3511a7bb47162b1c9
 
 dev_dependencies:
   flutter_test:

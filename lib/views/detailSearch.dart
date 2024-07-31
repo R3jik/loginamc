@@ -314,35 +314,34 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
     }
     }
   }
-  Future<void> _launchInBrowser() async {
-    if (_celular.isNotEmpty && _celular != 'No registrado') {
-    final Uri whatsappUrl = Uri(
-      scheme: 'https',
-      host: 'wa.me',
-      path: '51$_celular'
-    );
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(whatsappUrl,mode: LaunchMode.externalApplication);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("WhatsApp no está instalado")),
-      );
-    }
-  }
-  }
 
-  Future<void> _openWhatsApp()async{
-    if (_celular.isNotEmpty && _celular != 'No registrado') {
-    final Uri whatsappUrl = Uri.parse('whatsapp://send?+51$_celular');
-    if (await canLaunchUrl(whatsappUrl)) {
-      await launchUrl(whatsappUrl,mode: LaunchMode.externalApplication);
+  Future<void> _openWhatsAppDirect() async {
+  if (_celular.isNotEmpty && _celular != 'No registrado') {
+    // Asegúrate de que el número de teléfono esté en el formato correcto
+    String phoneNumber = _celular.replaceAll(RegExp(r'[^0-9]'), '');
+    
+    // Intenta abrir WhatsApp directamente
+    final Uri whatsappUri = Uri.parse('whatsapp://send?phone=51$phoneNumber');
+    
+    if (await canLaunchUrl(whatsappUri)) {
+      await launchUrl(whatsappUri, mode: LaunchMode.externalApplication);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("WhatsApp no está instalado")),
-      );
+      // Si no se puede abrir directamente, intenta con el enlace web
+      final Uri webWhatsappUri = Uri.parse('https://wa.me/51$phoneNumber');
+      if (await canLaunchUrl(webWhatsappUri)) {
+        await launchUrl(webWhatsappUri, mode: LaunchMode.externalApplication);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("No se pudo abrir WhatsApp")),
+        );
+      }
     }
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Número de teléfono no válido")),
+    );
   }
-  }
+}
 
   @override
 Widget build(BuildContext context) {
@@ -553,25 +552,45 @@ Widget build(BuildContext context) {
                       ),
                       if(_celular.isNotEmpty && _celular != "No registrado")
                         Padding(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(18),
                           child: Center(
                             child: Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: _eliminarTodasAsistencias,
-                          child: Text('Eliminar todas las asistencias'),
+                              mainAxisAlignment: MainAxisAlignment.center,
+                      children: [ 
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(iconSize: 32,
+                              icon: const Icon(Icons.delete_forever),
+                              onPressed: _eliminarTodasAsistencias,
+                              color: Colors.red,
+                            ),
+                            Text("Eliminar Todo", style: TextStyle(color: Colors.white),),
+                          ],
                         ),
-                        /*const SizedBox(width: 5),
-                        IconButton(
-                          icon: const Icon(Icons.chat),
-                          onPressed: _openWhatsApp,
-                          color: Colors.yellow,
-                        ),*/
-                        const SizedBox(width: 5),
-                        IconButton(
-                          icon: const Icon(Icons.call),
-                          onPressed: _makeCall,
-                          color: Colors.green,
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(iconSize: 30,
+                              icon: const Icon(Icons.call),
+                              onPressed: _makeCall,
+                              color: Colors.green,
+                            ),
+                            Text("Llamar Apoderado", style: TextStyle(color: Colors.white),),
+                          ],
+                        ),
+                        const SizedBox(width: 15),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            IconButton(iconSize: 30,
+                              icon: const Icon(Icons.chat_bubble_rounded),
+                              onPressed: _openWhatsAppDirect,
+                              color: Colors.green,
+                            ),
+                            Text("WhatsApp", style: TextStyle(color: Colors.white),),
+                          ],
                         ),
                       ],
                     ),),
