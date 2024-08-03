@@ -30,6 +30,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
   int _totalTardanzas = 0;
   String _cursoNombre = '';  // Añadimos una variable para el nombre del curso
   bool _isLoading = false;
+  bool _todasmarcadas = false;
   TextStyle texto = const TextStyle(
     fontSize: 22,
     fontWeight: FontWeight.bold,
@@ -70,20 +71,46 @@ class _AsistenciaViewState extends State<AsistenciaView> {
   }
 
   void _fetchCursoNombre() async {
+  try {
+    // Intenta obtener el documento del profesor en PROFESORES
     DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
         .collection('PROFESORES')
         .doc(widget.profesorId)
         .get();
+
+    // Si no existe en PROFESORES, busca en OWNERS
+    if (!profesorDoc.exists) {
+      profesorDoc = await FirebaseFirestore.instance
+          .collection('OWNERS')
+          .doc(widget.profesorId)
+          .get();
+
+      // Si tampoco existe en OWNERS, lanza una excepción
+      if (!profesorDoc.exists) {
+        throw Exception('El documento del profesor no existe en PROFESORES ni en OWNERS');
+      }
+    }
+
     String cursoId = profesorDoc['cursoId'];
     DocumentSnapshot cursoDoc = await FirebaseFirestore.instance
         .collection('CURSOS')
         .doc(cursoId)
         .get();
 
+    if (!cursoDoc.exists) {
+      throw Exception('El documento del curso no existe');
+    }
+
     setState(() {
       _cursoNombre = cursoDoc['nombre'];
     });
+  } catch (e) {
+    print('Error al obtener el nombre del curso: $e');
+    setState(() {
+      _cursoNombre = 'Error al cargar el curso';
+    });
   }
+}
   void _todasAsistentes(){
 
   }
@@ -94,82 +121,96 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       _totalAsistentes = _alumnas.where((alumna) => alumna['estado'] == 'asistencia').length;
       _totalFaltantes = _alumnas.where((alumna) => alumna['estado'] == 'falta').length;
       _totalTardanzas = _alumnas.where((alumna) => alumna['estado'] == 'tardanza').length;
+      _todasmarcadas = _alumnas.every((alumna) => alumna['estado'] != 'none');
     });
   }
 
   Future<void> _guardarAsistencia() async {
+
+  if (!_todasmarcadas) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Debe marcar la asistencia, tardanza o falta para todas las alumnas'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+
   setState(() {
     _isLoading = true;
   });
 
-  // Mostrar mensaje de que se está guardando la lista
-  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    content: Text('Guardando asistencia...'),
-  ));
-
-  // Validación para asegurarse de que todas las alumnas tienen un estado válido
-  bool todasValidas = _alumnas.every((alumna) => alumna['estado'] != 'none');
-  if (!todasValidas) {
+  try {
+    // Mostrar mensaje de que se está guardando la lista
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Text('Debe marcar la asistencia, tardanza o falta para todas las alumnas'),
+      content: Text('Guardando asistencia...'),
     ));
+
+    final tz.TZDateTime now = TimeZoneHelper.nowInLima();
+    final String fecha = DateFormat('dd-MM-yyyy').format(now);
+    final String hora = DateFormat('HH:mm:ss').format(now);
+
+    // Referencia al documento del profesor
+    DocumentReference profesorRef = FirebaseFirestore.instance
+        .collection('PROFESORES')
+        .doc(widget.profesorId);
+
+    // Verificar si el documento del profesor existe
+    DocumentSnapshot profesorDoc = await profesorRef.get();
+    if (!profesorDoc.exists) {
+      throw Exception('El documento del profesor no existe en la colección PROFESORES');
+    }
+
+    // Crear un nuevo documento en la colección ASISTENCIAS
+    DocumentReference asistenciaRef = await profesorRef
+        .collection('ASISTENCIAS')
+        .add({
+      'cursoId': _cursoNombre,
+      'fecha': fecha,
+      'hora': hora,
+      'seccionId': widget.seccionId,
+      'totalAlumnas': _totalAlumnas,
+      'totalAsistencias': _totalAsistentes,
+      'totalFaltas': _totalFaltantes,
+      'totalTardanzas': _totalTardanzas,
+    });
+
+    // Obtener el ID dinámico generado
+    String asistenciaId = asistenciaRef.id;
+
+    // Actualizar el documento con su propio ID
+    await asistenciaRef.update({'id': asistenciaId});
+
+    // Guardar los detalles de cada alumna
+    for (var alumna in _alumnas) {
+      await asistenciaRef.collection('DETALLES').doc(alumna['id']).set({
+        'nombre': alumna['nombre'],
+        'apellido_paterno': alumna['apellido_paterno'],
+        'apellido_materno': alumna['apellido_materno'],
+        'estado': alumna['estado'],
+        'fecha': fecha,
+        'hora': hora,
+      });
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Text('Asistencia guardada exitosamente'),
+      backgroundColor: Colors.green,
+    ));
+    Navigator.pop(context);
+  } catch (e) {
+    print('Error al guardar la asistencia: $e');
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Error al guardar la asistencia: ${e.toString()}'),
+      backgroundColor: Colors.red,
+    ));
+  } finally {
     setState(() {
       _isLoading = false;
     });
-    return;
   }
-
-  final tz.TZDateTime now = TimeZoneHelper.nowInLima();
-  final String fecha = DateFormat('dd-MM-yyyy').format(now);
-  final String hora = DateFormat('HH:mm:ss').format(now);
-  // ignore: unused_local_variable
-  final Timestamp timestamp = Timestamp.fromDate(now);
-
-  // Referencia al documento del profesor
-  DocumentReference profesorRef = FirebaseFirestore.instance
-      .collection('PROFESORES')
-      .doc(widget.profesorId);
-
-  // Crear un nuevo documento en la colección ASISTENCIAS
-  DocumentReference asistenciaRef = await profesorRef
-      .collection('ASISTENCIAS')
-      .add({
-    'cursoId': _cursoNombre,
-    'fecha': fecha,
-    'hora': hora,
-    'seccionId': widget.seccionId,
-    'totalAlumnas': _totalAlumnas,
-    'totalAsistencias': _totalAsistentes,
-    'totalFaltas': _totalFaltantes,
-    'totalTardanzas': _totalTardanzas,
-  });
-
-  // Obtener el ID dinámico generado
-  String asistenciaId = asistenciaRef.id;
-
-  // Actualizar el documento con su propio ID
-  await asistenciaRef.update({'id': asistenciaId});
-
-  // Guardar los detalles de cada alumna
-  for (var alumna in _alumnas) {
-    await asistenciaRef.collection('DETALLES').doc(alumna['id']).set({
-      'nombre': alumna['nombre'],
-      'apellido_paterno': alumna['apellido_paterno'],
-      'apellido_materno': alumna['apellido_materno'],
-      'estado': alumna['estado'],
-      'fecha': fecha,
-      'hora': hora,
-    });
-  }
-
-  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    content: Text('Asistencia guardada exitosamente'),
-  ));
-  setState(() {
-    _isLoading = false;
-  });
-  Navigator.pop(context);
 }
+
 
   void _marcarAsistenciaATodas() {
     setState(() {
@@ -179,6 +220,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       _totalAsistentes = _alumnas.length;
       _totalFaltantes = 0;
       _totalTardanzas = 0;
+      _todasmarcadas = true;
     });
   }
   void _marcarFaltaTodas(){
@@ -189,6 +231,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       _totalAsistentes = 0;
       _totalFaltantes = _alumnas.length;
       _totalTardanzas = 0;
+      _todasmarcadas = true;
     });
   }
   void _marcarTardanzaTodas(){
@@ -199,6 +242,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       _totalAsistentes = 0;
       _totalFaltantes = 0;
       _totalTardanzas = _alumnas.length;
+      _todasmarcadas = true;
     });
   }
 
@@ -368,20 +412,22 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                   ),
                   const SizedBox(height: 10,),
                   GestureDetector(
-                    onTap: _isLoading ? null : _guardarAsistencia,
+                    onTap: (_isLoading || !_todasmarcadas) ? null : _guardarAsistencia,
                     child: Container(
-                      height: screenHeight*0.05,
-                      width: screenWidth*0.6,
-                      decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                        color: Color(0XFF005FA9)
+                      height: screenHeight * 0.05,
+                      width: screenWidth * 0.6,
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(20)),
+                        color: (_isLoading || !_todasmarcadas) ? Colors.grey : const Color(0XFF005FA9),
                       ),
                       child: Center(
                         child: _isLoading
-                        ? const CircularProgressIndicator( valueColor:  AlwaysStoppedAnimation<Color>(Colors.white),)
-                        :  Text("Guardar Asistencia", style: texto,)),
+                          ? const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.white))
+                          : Text("Guardar Asistencia", style: texto),
+                      ),
                     ),
                   ),
+
                 ],
               ),
             ),

@@ -21,25 +21,78 @@ class SeccionesProfesoresPage extends StatelessWidget {
   SeccionesProfesoresPage({required this.profesorUid, required this.gradoId, required this.gradoNombre});
   
 
-  Future<Map<String, dynamic>> getUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid.dni).get();
-    return userDoc.data() as Map<String, dynamic>;
+ Future<Map<String, dynamic>> getUserInfo() async {
+    // Primero buscamos en la colección 'PROFESORES'
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('PROFESORES')
+        .doc(profesorUid.dni) //
+        .get();
+
+    // Si encontramos datos, los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+
+    // Si no encontramos datos en 'PROFESORES', buscamos en 'OWNER'
+    userDoc = await FirebaseFirestore.instance
+        .collection('OWNERS')
+        .doc(profesorUid.dni)
+        .get();
+
+    // Si encontramos datos en 'OWNER', los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+
+     // Si no encontramos datos en 'PROFESORES', buscamos en 'OWNER'
+    userDoc = await FirebaseFirestore.instance
+        .collection('AUXILIARES')
+        .doc(profesorUid.dni)
+        .get();
+
+    // Si encontramos datos en 'OWNER', los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+
+    // Si no encontramos datos en ninguna de las colecciones, retornamos un mapa vacío o lanzamos una excepción
+    return {}; // Puedes personalizar este comportamiento
   }
 
   
   Future<List<Map<String, dynamic>>> getSecciones(AppUser profesorUid, String gradoId) async {
   try {
-    // Obtiene el documento del profesor
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorUid.dni).get();
+    // Intenta obtener el documento del profesor
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('PROFESORES')
+        .doc(profesorUid.dni)
+        .get();
     
-    // Verifica si el documento existe y extrae la lista de secciones
+    // Si el documento no existe en PROFESORES, busca en OWNERS
     if (!userDoc.exists) {
-      throw Exception('El documento del profesor no existe');
+      userDoc = await FirebaseFirestore.instance
+          .collection('OWNERS')
+          .doc(profesorUid.dni)
+          .get();
+      
+    }if (!userDoc.exists) {
+      userDoc = await FirebaseFirestore.instance
+          .collection('AUXILIARES')
+          .doc(profesorUid.dni)
+          .get();
+
+      // Si tampoco existe en OWNERS, lanza una excepción
+      if (!userDoc.exists) {
+        throw Exception('El documento del profesor no existe en PROFESORES ni en OWNERS');
+      }
     }
+
+    // Determina la colección correcta para buscar las secciones
+    String collectionName = userDoc.reference.parent.id;
 
     // Obtiene los IDs de secciones desde la subcolección SECCIONES
     QuerySnapshot seccionesSnapshot = await FirebaseFirestore.instance
-        .collection('PROFESORES')
+        .collection(collectionName)
         .doc(profesorUid.dni)
         .collection('SECCIONES')
         .get();
@@ -75,8 +128,6 @@ class SeccionesProfesoresPage extends StatelessWidget {
     print('Error al obtener secciones: $e');
     return []; // Retorna una lista vacía en caso de error
   }
-
-  
 }
 
 

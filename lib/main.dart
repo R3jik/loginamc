@@ -26,7 +26,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  ConnectionAwareWidget(
-      inactivitySeconds: 20,
+      inactivitySeconds: 2,
       child:  MaterialApp(
             debugShowCheckedModeBanner: false,
             theme: ThemeData(

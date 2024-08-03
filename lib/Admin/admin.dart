@@ -22,6 +22,8 @@ class _AdminPanelState extends State<AdminPanel> {
 
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _dniController = TextEditingController();
+  final TextEditingController _rolController = TextEditingController();
 
   @override
   void initState() {
@@ -40,91 +42,119 @@ class _AdminPanelState extends State<AdminPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Admin Panel'),
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Bloque de Usuarios Conectados
-            Text('Usuarios Conectados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore.collection('USUARIOS').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return CircularProgressIndicator();
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var user = snapshot.data!.docs[index];
-                    bool isConnected = user['isConnected'] ?? false;
-                    return ListTile(
-                      title: Text(user['email']),
-                      trailing: Icon(
-                        isConnected ? Icons.circle : Icons.circle_outlined,
-                        color: isConnected ? Colors.green : Colors.red,
+    return SafeArea(   
+      child: Container(
+        decoration: BoxDecoration(color:const Color(0XFF071E30),),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 5,),
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.05),
+                      blurRadius: 10,
+                      offset: Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Center(child: Text("ADMIN PANEL", style: TextStyle(color: Colors.white70, fontSize: 20),)),
+                ),
+              SizedBox(height: 20,),
+              // Bloque de Usuarios Conectados
+              const Text('Usuarios Conectados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+              SizedBox(height: 10),
+              StreamBuilder<QuerySnapshot>(
+                stream: _firestore.collection('USUARIOS').snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.docs.length,
+                    itemBuilder: (context, index) {
+                      var user = snapshot.data!.docs[index];
+                      bool isConnected = user['isConnected'] ?? false;
+                      return ListTile(
+                        title: Text(user['email'], style: const TextStyle(color: Colors.white)),
+                        trailing: Icon(
+                          isConnected ? Icons.circle : Icons.circle_outlined,
+                          color: isConnected ? Colors.green : Colors.red,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+        
+              // Bloque de Añadir/Quitar Usuarios
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                      const Text('Añadir/Quitar Usuarios', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                      const SizedBox(height: 20),
+                      TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Email',border: OutlineInputBorder(),labelStyle: TextStyle(color: Colors.white60)),
                       ),
-                    );
-                  },
-                );
-              },
-            ),
-            SizedBox(height: 20),
-
-            // Bloque de Añadir/Quitar Usuarios
-            Text('Añadir/Quitar Usuarios', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(labelText: 'Email'),
-            ),
-            TextField(
-              controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: _addUser,
-                  child: Text('Añadir Usuario'),
+                      const SizedBox(height: 13),
+                      TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: _passwordController,
+                        decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder(),labelStyle: TextStyle(color: Colors.white60)),
+                        obscureText: true,
+                      ),
+                      const SizedBox(height: 13),
+                      TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: _dniController,
+                        decoration: const InputDecoration(labelText: 'DNI', border: OutlineInputBorder(),labelStyle: TextStyle(color: Colors.white60)),
+                        maxLength: 8,
+                        canRequestFocus: true,
+                        keyboardType: TextInputType.number,
+                      ),
+                      const SizedBox(height: 13),
+                      TextField(
+                        style: const TextStyle(color: Colors.white),
+                        controller: _rolController,
+                        decoration: const InputDecoration(labelText: 'Rol', border: OutlineInputBorder(),labelStyle: TextStyle(color: Colors.white60)),
+        
+                      ),
+        
+                      const SizedBox(height: 20,),
+        
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _addUser,
+                            child: const Text('Añadir Usuario'),
+                          ),
+                          SizedBox(width: 10),
+                          ElevatedButton(
+                            onPressed: _deleteUser,
+                            child: const Text('Quitar Usuario'),
+                          ),
+                        ],
+                      ),
+                  ],
                 ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: _deleteUser,
-                  child: Text('Quitar Usuario'),
-                ),
-              ],
-            ),
-            SizedBox(height: 20),
-
-            // Bloque de Registro de Cambios (Opcional)
-            Text('Registro de Cambios', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            StreamBuilder<QuerySnapshot>(
-              stream: _firestore.collection('LONGS').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) return CircularProgressIndicator();
-                return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    var log = snapshot.data!.docs[index];
-                    var timestamp = log['timestamp'];
-                    // String formattedDate = timestamp != null ? (timestamp as Timestamp).toDate().toString() : 'No date';
-                    return ListTile(
-                      title: Text(log['action']),
-                      // subtitle: Text(formattedDate),
-                    );
-                  },
-                );
-              },
-            ),
-          ],
+              ),
+              
+              const SizedBox(height: 20),
+        
+              
+            ],
+          ),
         ),
       ),
     );
@@ -135,13 +165,19 @@ class _AdminPanelState extends State<AdminPanel> {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
+
       );
       await _firestore.collection('USUARIOS').doc(userCredential.user!.uid).set({
         'email': _emailController.text,
         'isConnected': false,
+        'rol': _rolController.text,
+        'dni': _dniController.text,
+        'contraseña': _passwordController.text,
       });
       _emailController.clear();
       _passwordController.clear();
+      _dniController.clear();
+      _rolController.clear();
     } catch (e) {
       print("Error: $e");
     }
@@ -157,6 +193,8 @@ class _AdminPanelState extends State<AdminPanel> {
       await user.user!.delete();
       _emailController.clear();
       _passwordController.clear();
+      _dniController.clear();
+      _rolController.clear();
     } catch (e) {
       print("Error: $e");
     }
