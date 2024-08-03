@@ -23,14 +23,59 @@ class _ProfileAuxState extends State<ProfileAux> {
   // ignore: unused_field
   List<dynamic> _seccionData = [];
   Map<String, dynamic>? _cursoData;
-  List<Map<String, dynamic>> _asistencias = [];
+  
   
 
   @override
   void initState() {
     super.initState();
+    _fetchProfesorData();
   }
 
+void _fetchProfesorData() async {
+  try {
+    // Obtener el documento del profesor
+    DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
+        .collection('AUXILIARES')
+        .doc(widget.profesorId.dni)
+        .get();
+
+    if (!profesorDoc.exists) {
+      print('El documento del profesor no existe.');
+      return;
+    }
+
+    print('Profesor Data: ${profesorDoc.data()}');
+
+    // Actualizar el estado con los datos del profesor
+    setState(() {
+      _profesorData = profesorDoc.data() as Map<String, dynamic>;
+      cursoId = profesorDoc['cursoId'];
+    });
+
+    // Obtener el documento del curso
+    DocumentSnapshot<Map<String, dynamic>> nombreCurso = await FirebaseFirestore
+        .instance
+        .collection('AUXILIARES')
+        .doc(widget.profesorId.dni)
+        .get();
+
+    if (!nombreCurso.exists) {
+      print('El documento del curso no existe.');
+      return;
+    }
+
+    print('Curso Data: ${nombreCurso.data()}');
+
+    // Actualizar el estado con los datos del curso
+    setState(() {
+      _cursoData = nombreCurso.data();
+    });
+
+  } catch (e) {
+    print('Error fetching data: $e');
+  }
+}
 
   void _cerrarSesion() async {
     await FirebaseAuth.instance.signOut();
@@ -179,7 +224,7 @@ DateTime? _parseDate(dynamic fecha) {
                                 Container(
                                   width: 200,
                                   child: Text(
-                                    '${_cursoData?['nombre'] ?? ''}',
+                                    '${_cursoData?['CursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
                                 ),

@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
 import 'package:loginamc/helpers/navigatorAdmin.dart';
+import 'package:loginamc/helpers/navigatorAuxiliar.dart';
+import 'package:loginamc/helpers/navigatorOwner.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/resetPassView.dart';
 
@@ -101,11 +103,19 @@ class _LoginPageState extends State<LoginPage> {
             MaterialPageRoute(builder: (context) => NavigatorProfesor(user: appUser)),
           );
         } else if (role == 'AUXILIAR') {
-          // Implementar navegación para AUXILIAR
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => NavigatorAuxiliar(user: appUser)),
+          );
         } else if (role == 'ADMINISTRADOR') {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => NavigatorAdmin(user: appUser)),
+          );
+        } else if (role == 'OWNERS') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => NavigatoeOwner(user: appUser)),
           );
         } else {
           setState(() {

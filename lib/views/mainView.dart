@@ -60,17 +60,55 @@ void _showSecretViewMessage() {
   );
 }
   Future<Map<String, dynamic>> getUserInfo() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get(); //Cambiar la terminación .uid por .dni que pide el AppUser
-    return userDoc.data() as Map<String, dynamic>;
+    // Primero buscamos en la colección 'PROFESORES'
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection('PROFESORES')
+        .doc(widget.user.dni)
+        .get();
+
+    // Si encontramos datos, los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+
+    // Si no encontramos datos en 'PROFESORES', buscamos en 'OWNER'
+    userDoc = await FirebaseFirestore.instance
+        .collection('OWNERS')
+        .doc(widget.user.dni)
+        .get();
+
+    // Si encontramos datos en 'OWNER', los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+    // Si no encontramos datos en 'PROFESORES', buscamos en 'OWNER'
+    userDoc = await FirebaseFirestore.instance
+        .collection('AUXILIARES')
+        .doc(widget.user.dni)
+        .get();
+
+    // Si encontramos datos en 'OWNER', los retornamos
+    if (userDoc.exists) {
+      return userDoc.data() as Map<String, dynamic>;
+    }
+
+    // Si no encontramos datos en ninguna de las colecciones, retornamos un mapa vacío o lanzamos una excepción
+    return {}; // Puedes personalizar este comportamiento
   }
 
   Future<List<Map<String, dynamic>>> getGrados() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('PROFESORES').doc(widget.user.dni).get();//Cambiar la terminación .uid por .dni que pide el AppUser
-    List<dynamic> gradoIds = userDoc['gradoId'];
+    // Obtenemos la información del usuario (ya sea de 'PROFESORES' o 'OWNER')
+    Map<String, dynamic> userData = await getUserInfo();
 
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('GRADOS').where(FieldPath.documentId,whereIn: gradoIds)
-    .orderBy('numero', descending: false).get();
-    
+    // Suponiendo que el campo 'gradoId' tiene la misma estructura en ambas colecciones
+    List<dynamic> gradoIds = userData['gradoId'];
+
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('GRADOS')
+        .where(FieldPath.documentId, whereIn: gradoIds)
+        .orderBy('numero', descending: false)
+        .get();
+
     return querySnapshot.docs
         .map((doc) => {
               'id': doc.id,

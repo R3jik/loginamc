@@ -595,14 +595,20 @@ Widget build(BuildContext context) {
                       ],
                     ),),
                           )
-                      else
-                      Padding(
-                        padding: const EdgeInsets.all(12),
-                        child: Center(
-                          child: ElevatedButton(
-                            onPressed: _eliminarTodasAsistencias,
-                            child: Text('Eliminar todas las asistencias'),
-                          ),
+                      else 
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 12,),
+                            IconButton(iconSize: 32,
+                              icon: const Icon(Icons.delete_forever),
+                              onPressed: _eliminarTodasAsistencias,
+                              color: Colors.red,
+                            ),
+                            const Text("Eliminar Todo", style: TextStyle(color: Colors.white),),
+                            const SizedBox(height: 15,),
+                          ],
                         ),
                       ),
                       const Text('ESTADISTICAS TOTALES',
