@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/rendering.dart';
+import 'package:loginamc/Admin/graficos.dart';
 import 'package:loginamc/helpers/navigatorAdmin.dart';
 import 'package:loginamc/helpers/navigatorAuxiliar.dart';
 import 'package:loginamc/helpers/navigatorOwner.dart';
@@ -116,6 +117,11 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => NavigatoeOwner(user: appUser)),
+          );
+        } else if (role == 'DIRECTOR') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => AttendanceDashboard(user: appUser)),
           );
         } else {
           setState(() {
