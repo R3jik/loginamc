@@ -44,15 +44,15 @@ class _AdminPanelState extends State<AdminPanel> {
   Widget build(BuildContext context) {
     return SafeArea(   
       child: Container(
-        decoration: BoxDecoration(color:const Color(0XFF071E30),),
+        decoration: const BoxDecoration(color:const Color(0XFF071E30),),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 5,),
+              const SizedBox(height: 5,),
               Container(
-                padding: EdgeInsets.all(16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(16),
@@ -60,16 +60,22 @@ class _AdminPanelState extends State<AdminPanel> {
                     BoxShadow(
                       color: Colors.black.withOpacity(.05),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-                child: Center(child: Text("ADMIN PANEL", style: TextStyle(color: Colors.white70, fontSize: 20),)),
+                child: const Center(child: Text("ADMIN PANEL", 
+                style: TextStyle(
+                  color: Colors.white70, 
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                    ),
+                  )),
                 ),
-              SizedBox(height: 20,),
+              const SizedBox(height: 20,),
               // Bloque de Usuarios Conectados
               const Text('Usuarios Conectados', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               StreamBuilder<QuerySnapshot>(
                 stream: _firestore.collection('USUARIOS').snapshots(),
                 builder: (context, snapshot) {

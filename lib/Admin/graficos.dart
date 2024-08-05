@@ -1,7 +1,9 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/widgets.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:intl/intl.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -42,70 +44,136 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Container(
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color.fromARGB(255, 13, 14, 104)!, Color.fromARGB(255, 66, 2, 68)!],
+      child: Scaffold(
+        body: Container(
+          height: double.infinity,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomLeft,
+              colors: [Color.fromARGB(255, 0, 57, 180)!, Color.fromARGB(255, 2, 7, 32)!],
+            ),
           ),
-        ),
-        child:SingleChildScrollView(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment:CrossAxisAlignment.start,
-            children: [
-              SizedBox(height: 5),
-              Container(
-              padding: EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Center(child: Text("MENU DE GRAFICOS", style: TextStyle(color: Colors.white70, fontSize: 20),)),
-              ),
-              SizedBox(height: 24),
-              _buildDateRangePicker(),
-              SizedBox(height: 24),
-              _buildCarouselSlider(),
-              SizedBox(height: 24),
-              // _buildChartContainer(
-              //   'Faltas y Tardanzas por Sección'
-              //   // _buildStackedBarChart(),
-              // ),
-              Center(
-                child: GestureDetector(
-                  child: Container(
-                  padding: EdgeInsets.all(16),
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(16),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color.fromARGB(255, 231, 12, 12).withOpacity(.6),
-                        blurRadius: 2,
-                        offset: Offset(0, 0),
-                      ),
+          child:SingleChildScrollView(
+            padding: const EdgeInsets.all(10),
+            child: Column(
+              crossAxisAlignment:CrossAxisAlignment.start,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text("BIENVENIDO DIRECCION", 
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),),
+                      Icon(
+                        Icons.person_2_rounded,
+                        color: Colors.white70,
+                        size: 30,
+                        ),
                     ],
                   ),
-                  child: Center(child: Text("CERRAR SESION", style: TextStyle(color: Colors.white70, fontSize: 17),)),
-                  ),
-                onTap: () {
-                  _cerrarSesion();
-                },
                 ),
-              ),
-            
-            ],
+                const SizedBox(height: 5),
+                Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: const Center(child: Text("MENU DE GRAFICOS", 
+                style: TextStyle(
+                  color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold),
+                  )),
+                ),
+                const SizedBox(height: 24),
+                _buildDateRangePicker(),
+                const SizedBox(height: 15),
+                Container(
+                padding: const EdgeInsets.all(16),
+                child: Center(child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Leyenda de Graficos", 
+                    style: TextStyle(
+                      color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(width: 40,),
+                    const Text("Falta", 
+                    style: TextStyle(
+                      color: Colors.white70, fontSize: 15,),
+                    ),
+                    const SizedBox(width: 8,),
+                    Container(
+                      height: 15,
+                      width: 15,
+                      decoration: const BoxDecoration(color: Colors.red),
+                      ),
+                    
+                    const SizedBox(width: 20,),
+                    const Text("Tardanza", 
+                    style: TextStyle(
+                      color: Colors.white70, fontSize: 15,),
+                    ),
+                    const SizedBox(width: 8,),
+                    Container(
+                      height: 15,
+                      width: 15,
+                      decoration: const BoxDecoration(color: Colors.amber),
+                      ),
+                  ],
+                )),
+                ),
+                const SizedBox(height: 5),
+                _buildCarouselSlider(),
+                const SizedBox(height: 24),
+                // _buildChartContainer(
+                //   'Faltas y Tardanzas por Sección'
+                //   // _buildStackedBarChart(),
+                // ),
+                Center(
+                  child: GestureDetector(
+                    child: Container(
+                    padding: const EdgeInsets.all(16),
+                    width: 200,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color.fromARGB(255, 231, 12, 12).withOpacity(.9),
+                          blurRadius: 2,
+                          offset: const Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: const Center (child: Text("CERRAR SESION", 
+                    style: TextStyle(
+                      color: Colors.white70, 
+                      fontSize: 17,
+                      fontWeight: FontWeight.bold,
+                      ),
+                    )),
+                    ),
+                  onTap: () {
+                    _cerrarSesion();
+                  },
+                  ),
+                ),
+              
+              ],
+            ),
           ),
         ),
       ),
@@ -121,44 +189,60 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
   }
   
   Widget _buildDateRangePicker() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.05),
-            blurRadius: 10,
-            offset: Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          TextButton(
-            onPressed: () async {
-              final DateTimeRange? picked = await showDateRangePicker(
-                context: context,
-                firstDate: DateTime(2000),
-                lastDate: DateTime.now(),
-                initialDateRange: DateTimeRange(start: startDate, end: endDate),
-              );
-              if (picked != null) {
-                setState(() {
-                  startDate = picked.start;
-                  endDate = picked.end;
-                });
-              }
-    },
-            child: Text(
-              '${DateFormat('dd MMM').format(startDate)} - ${DateFormat('dd MMM').format(endDate)}',
-              style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+    return GestureDetector(
+      onTap: () async {
+        final DateTimeRange? picked = await showDateRangePicker(
+                  context: context,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime.now(),
+                  initialDateRange: DateTimeRange(start: startDate, end: endDate),
+                );
+                if (picked != null) {
+                  setState(() {
+                    startDate = picked.start;
+                    endDate = picked.end;
+                  });
+                }
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
-          ),
-          Icon(Icons.calendar_today, color: Colors.white60),
-        ],
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton(
+              onPressed: () {
+                // final DateTimeRange? picked = await showDateRangePicker(
+                //   context: context,
+                //   firstDate: DateTime(2000),
+                //   lastDate: DateTime.now(),
+                //   initialDateRange: DateTimeRange(start: startDate, end: endDate),
+                // );
+                // if (picked != null) {
+                //   setState(() {
+                //     startDate = picked.start;
+                //     endDate = picked.end;
+                //   });
+                // }
+            },
+              child: Text(
+                '${DateFormat('dd MMM').format(startDate)} - ${DateFormat('dd MMM').format(endDate)}',
+                style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const Icon(Icons.calendar_today, color: Colors.white60),
+          ],
+        ),
       ),
     );
   }
@@ -176,7 +260,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
       items: [
         _buildChartContainer('Faltas y Tardanzas\n', _buildLineChart()),
         _buildChartContainer('Distribución por Curso\n', _buildPieChart()),
-        _buildChartContainer('Faltas y Tardanzas por Sección\n', _buildGroupedBarChart()),
+        _buildChartContainer('Faltas y Tardanzas por Grado y Sección\n', _buildGroupedBarChart()),
       ],
     );
   }
@@ -184,7 +268,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
   Widget _buildChartContainer(String title, Widget chart) {
     return Container(
       
-      padding: EdgeInsets.only(bottom: 20, top: 30, left: 20, right: 20),
+      padding: const EdgeInsets.only(bottom: 20, top: 30, left: 20, right: 20),
       decoration: BoxDecoration(
         color: Colors.black.withOpacity(0.05),
         borderRadius: BorderRadius.circular(16),
@@ -192,7 +276,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
           BoxShadow(
             color: Colors.white.withOpacity(0.1),
             blurRadius: 1,
-            offset: Offset(0, 10),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -204,7 +288,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
             title,
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white60),
           ),
-          SizedBox(height: 1),
+          const SizedBox(height: 1),
           SizedBox(
             height: 280, // Altura fija para el gráfico
             child: chart,
@@ -222,7 +306,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
 
     return LineChart(
       LineChartData(
-        gridData: FlGridData(show: false),
+        gridData: const FlGridData(show: false),
         titlesData: FlTitlesData(
           bottomTitles: AxisTitles(
             sideTitles: SideTitles(
@@ -234,7 +318,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
                   DateTime date = DateFormat('dd-MM-yyyy').parse(filteredData[value.toInt()]['fecha']);
                   return Text(
                     DateFormat('d MMM').format(date),
-                    style: TextStyle(color: Colors.white, fontSize: 12),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   );
                 }
                 return Text('');
@@ -247,17 +331,18 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
               reservedSize: 30,
               interval: 5,
               getTitlesWidget: (value, meta) {
-                return Text(value.toInt().toString(), style: TextStyle(color: Colors.white70, fontSize: 10));
+                return Text(value.toInt().toString(), 
+                style: const TextStyle(color: Colors.white70, fontSize: 12));
               },
             ),
           ),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
         borderData: FlBorderData(show: false),
         lineBarsData: [
           _lineChartBarData(filteredData, 'totalFaltas', Colors.red),
-          _lineChartBarData(filteredData, 'totalTardanzas', Colors.blue),
+          _lineChartBarData(filteredData, 'totalTardanzas', Colors.yellow),
         ],
         lineTouchData: LineTouchData(
           touchTooltipData: LineTouchTooltipData(
@@ -285,7 +370,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
       color: color,
       barWidth: 3,
       isStrokeCapRound: true,
-      dotData: FlDotData(show: false),
+      dotData: const FlDotData(show: false),
       belowBarData: BarAreaData(show: false),
     );
   }
@@ -309,18 +394,18 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
         centerSpaceRadius: 40,
         sections: [
           ...faltasPorCurso.entries.map((entry) => PieChartSectionData(
-                color: Colors.red.withOpacity(0.8),
+                color: Colors.red.withOpacity(0.9),
                 value: entry.value.toDouble(),
                 title: '${entry.key}\n${entry.value}',
                 radius: 100,
-                titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
               )),
           ...tardanzasPorCurso.entries.map((entry) => PieChartSectionData(
-                color: Colors.blue.withOpacity(0.8),
+                color: Colors.amber.withOpacity(0.9),
                 value: entry.value.toDouble(),
                 title: '${entry.key}\n${entry.value}',
-                radius: 80,
-                titleStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                radius: 90,
+                titleStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
               )),
         ],
       ),
@@ -445,9 +530,11 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
               showTitles: true,
               getTitlesWidget: (value, meta) {
                 if (value.toInt() >= 0 && value.toInt() < dataBySection.length) {
-                  return Text(dataBySection.keys.elementAt(value.toInt()), style: TextStyle(color: Colors.black54, fontSize: 10));
+                  return Text(dataBySection.keys.elementAt(value.toInt()), 
+                  style: const TextStyle(color: Colors.white70, fontSize: 15, fontWeight: FontWeight.bold)
+                  );
                 }
-                return Text('');
+                return const Text('');
               },
             ),
           ),
@@ -457,14 +544,15 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
               reservedSize: 30,
               interval: 5,
               getTitlesWidget: (value, meta) {
-                return Text(value.toInt().toString(), style: TextStyle(color: Colors.white70, fontSize: 10));
+                return Text(value.toInt().toString(), 
+                style: const TextStyle(color: Colors.white70, fontSize: 12));
               },
             ),
           ),
-          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         ),
-        gridData: FlGridData(show: false),
+        gridData: const FlGridData(show: false),
         borderData: FlBorderData(show: false),
         barGroups: dataBySection.entries.map((entry) {
           return BarChartGroupData(
@@ -479,7 +567,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
               ),
               BarChartRodData(
                 toY: entry.value['tardanzas']!.toDouble(),
-                color: Colors.blue,
+                color: Colors.yellow,
                 width: 8,
                 borderRadius: BorderRadius.circular(4),
               ),

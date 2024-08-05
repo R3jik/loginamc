@@ -59,7 +59,7 @@ void _fetchProfesorData() async {
         .collection('AUXILIARES')
         .doc(widget.profesorId.dni)
         .get();
-
+    
     if (!nombreCurso.exists) {
       print('El documento del curso no existe.');
       return;

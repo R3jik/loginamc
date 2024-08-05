@@ -30,7 +30,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
       Mainview(user: widget.user),     
       BuscarView(user: widget.user),
       ProfesorProfile(profesorId: widget.user),
-      AdminPanel(user: widget.user),
+      // AdminPanel(user: widget.user),
     ];
   }
   
@@ -73,10 +73,10 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
                 icon: Icons.person_pin,
                 text: "Perfil",
               ),
-              GButton(
-                icon: Icons.person_pin,
-                text: "Admin",
-              ),
+              // GButton(
+              //   icon: Icons.person_pin,
+              //   text: "Admin",
+              // ),
             ],
             selectedIndex: _selectedIndex,
               onTabChange: (index) {
