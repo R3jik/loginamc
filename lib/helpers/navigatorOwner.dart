@@ -9,16 +9,16 @@ import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/searchView.dart';
 
 
-class NavigatoeOwner extends StatefulWidget {
+class NavigatorOwner extends StatefulWidget {
   final AppUser user; //Cambiar el tipo de dato user a AppUser e importar la pagina loginView.dart porque ahi esta la clase creada
 
-  const NavigatoeOwner({super.key, required this.user});
+  const NavigatorOwner({super.key, required this.user});
 
   @override
-  State<NavigatoeOwner> createState() => _NavigatorOwnerState();
+  State<NavigatorOwner> createState() => _NavigatorOwnerState();
 }
 
-class _NavigatorOwnerState extends State<NavigatoeOwner> {
+class _NavigatorOwnerState extends State<NavigatorOwner> {
   
   int _selectedIndex = 0;
   late final List<Widget> _widgetOptions;

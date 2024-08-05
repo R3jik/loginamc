@@ -428,7 +428,7 @@ Widget build(BuildContext context) {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${widget.alumna['nombre']} ',
+                                              '${widget.alumna['nombre'].toString().trim()} ',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -457,7 +457,7 @@ Widget build(BuildContext context) {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${widget.alumna['apellido_paterno']} ',
+                                              '${widget.alumna['apellido_paterno'].toString().trim()} ',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -487,7 +487,7 @@ Widget build(BuildContext context) {
                                             child: Padding(
                                               padding: const EdgeInsets.only(left: 10),
                                               child: Text(
-                                                '${widget.alumna['apellido_materno']}',
+                                                '${widget.alumna['apellido_materno'].toString().trim()} ',
                                                 style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,

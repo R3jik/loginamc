@@ -111,16 +111,16 @@ class _UploadPageAlumnaState extends State<UploadPageAlumna> {
         String id = row[0].toString().trim();
         if (id.isNotEmpty && id != 'No registrado' && RegExp(r'^\d{8}$').hasMatch(id)) {
           await FirebaseFirestore.instance.collection('ALUMNAS').doc(id).set({
-            'nombre': row[1].toString(),
-            'apellido_paterno': row[2].toString(),
-            'apellido_materno': row[3].toString(),
-            'seccionId': row[11].toString(),
-            'genero': row[6].toString(),
-            'dni_apoderado': row[7].toString(),
-            'apellidos_nombre_apoderado': row[8].toString(),
-            'parentesco_apoderado': row[9].toString(),
-            'celular_apoderado': row[10].toString(),
-            'auxiliarId': row.length > 12 ? row[12].toString() : null,
+            'nombre': row[1].toString().trim(),
+            'apellido_paterno': row[2].toString().trim(),
+            'apellido_materno': row[3].toString().trim(),
+            'seccionId': row[11].toString().trim(),
+            'genero': row[6].toString().trim(),
+            'dni_apoderado': row[7].toString().trim(),
+            'apellidos_nombre_apoderado': row[8].toString().trim(),
+            'parentesco_apoderado': row[9].toString().trim(),
+            'celular_apoderado': row[10].toString().trim(),
+            'auxiliarId': row.length > 12 ? row[12].toString().trim() : null,
           }, SetOptions(merge: true));
         }
       }

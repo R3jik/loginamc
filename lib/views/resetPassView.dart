@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:loginamc/views/bienvenidaView.dart';
+import 'package:loginamc/views/loginView.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   
@@ -23,7 +23,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     if (_formKey.currentState!.validate()) {
       try {
         await FirebaseAuth.instance.sendPasswordResetEmail(
-          email: _emailController.text,
+          email: _emailController.text.trim(),
         );
         showDialog(
           context: context,
@@ -33,7 +33,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Bienvenidaview()));
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage()));
                 },
                 child: const Text('OK'),
               ),

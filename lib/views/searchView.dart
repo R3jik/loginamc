@@ -276,7 +276,7 @@ DateTime? _parseDate(String dateStr) {
                                     child: ListTile(
                                       leading: const Icon(Icons.person, size: 50, color: Colors.white),
                                       title: Text(
-                                        '${alumna['nombre']} ${alumna['apellido_paterno']} ${alumna['apellido_materno']}',
+                                        '${alumna['nombre'].toString().trimLeft()} ${alumna['apellido_paterno'].toString().trimLeft()} ${alumna['apellido_materno'].toString().trimLeft()}',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,

@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
         } else if (role == 'OWNERS') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => NavigatoeOwner(user: appUser)),
+            MaterialPageRoute(builder: (context) => NavigatorOwner(user: appUser)),
           );
         } else if (role == 'DIRECTOR') {
           Navigator.pushReplacement(
