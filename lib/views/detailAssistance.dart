@@ -1,0 +1,232 @@
+// ignore_for_file: unused_field
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:loginamc/helpers/timezone_helper.dart';
+import 'package:loginamc/views/loginView.dart';
+import 'package:loginamc/views/mainView.dart';
+
+class detailAssistancePage extends StatefulWidget {
+  final String seccionId;
+  final AppUser profesorId;
+  final String asistenciaId;
+  
+
+  detailAssistancePage({
+    super.key,
+    required this.seccionId,
+    required this.profesorId,
+    required this.asistenciaId,
+  });
+
+  @override
+  State<detailAssistancePage> createState() => _detailAssistancePageState();
+}
+
+class _detailAssistancePageState extends State<detailAssistancePage> {
+  Map<String, dynamic>? _profesorData;
+  Map<String, dynamic>? _asistenciaData;
+  List<Map<String, dynamic>> _detalleAlumnas = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    TimeZoneHelper.initializeTimeZones();
+    _fetchDatosAsistencia();
+  }
+
+  Future<void> _fetchDatosAsistencia() async {
+    try {
+      DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
+          .collection('PROFESORES')
+          .doc(widget.profesorId.dni)
+          .get();
+
+      if (profesorDoc.exists) {
+        setState(() {
+          _profesorData = profesorDoc.data() as Map<String, dynamic>;
+        });
+      }
+
+      DocumentSnapshot asistenciaDoc = await FirebaseFirestore.instance
+          .collection('PROFESORES')
+          .doc(widget.profesorId.dni)
+          .collection('ASISTENCIAS')
+          .doc(widget.asistenciaId)
+          .get();
+
+      if (asistenciaDoc.exists) {
+        setState(() {
+          _asistenciaData = asistenciaDoc.data() as Map<String, dynamic>;
+        });
+
+        QuerySnapshot detalleSnapshot = await asistenciaDoc.reference
+        .collection('DETALLES')
+        .orderBy('apellido_paterno')
+        .orderBy('apellido_materno')
+        .get();
+
+        setState(() {
+          _detalleAlumnas = detalleSnapshot.docs.map((doc) {
+            return {
+              'nombre': doc['nombre'],
+              'apellido_paterno': doc['apellido_paterno'],
+              'apellido_materno': doc['apellido_materno'],
+              'estado': doc['estado'],
+              'fecha': doc['fecha'],
+              'hora': doc['hora'],
+            };
+          }).toList();
+        });
+      }
+    } catch (e) {
+      print('Error al obtener los datos de asistencia: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  Icon _getEstadoIcon(String estado) {
+    switch (estado) {
+      case 'asistencia':
+        return const Icon(Icons.check_circle, color: Colors.green);
+      case 'falta':
+        return const Icon(Icons.remove_circle, color: Colors.red);
+      case 'tardanza':
+        return const Icon(Icons.access_time_filled, color: Colors.yellow);
+      default:
+        return const Icon(Icons.help, color: Colors.grey);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenSize = MediaQuery.of(context).size;
+    final screenWidth = screenSize.width;
+    final screenHeight = screenSize.height;
+    TextStyle texto1 = const TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,);
+    TextStyle texto2 = const TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,);
+
+    return SafeArea(
+      child: Scaffold(
+        body: Stack(
+          children:[ 
+            Positioned(
+              top: 0,
+              child: Container(
+                height: screenHeight,
+                width: screenWidth,
+                color: fondo2,
+              ),
+            ),
+            _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : _asistenciaData == null
+                  ? Center(child: Text('No se encontraron datos de asistencia'))
+                  : Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            height: 165,
+                            width: screenWidth,
+                            decoration: BoxDecoration(
+                              color: fondo1,
+                              borderRadius: const BorderRadius.all(Radius.circular(20))
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(10.0),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text('Curso: ${_asistenciaData?['cursoId'] ?? 'N/A'}', style: texto1),
+                                          Text('Grado: ${widget.seccionId.substring(1,2)}', style: texto1),
+                                          Text('Sección: ${widget.seccionId.substring(2,3)}', style: texto1),
+                                        ],
+                                      ),
+                                      Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Icon(Icons.calendar_month,color: whiteColor,),
+                                              Text('${_asistenciaData?['fecha'] ?? 'N/A'}', style: texto1),
+                                            ],
+                                          ),
+                                          Text('${_asistenciaData?['hora'] ?? 'N/A'}', style: texto1),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 20,),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.group,color: whiteColor,),
+                                      Text('${_asistenciaData?['totalAlumnas'] ?? 'N/A'}', style: texto1),
+                                      const SizedBox(width: 30,),
+                                      const Icon(Icons.check_circle,color: Colors.green,),
+                                      Text('${_asistenciaData?['totalAsistencias'] ?? 'N/A'}', style: texto1),
+                                      const SizedBox(width: 10,),
+                                      const Icon(Icons.remove_circle, color: Colors.red,),
+                                      Text('${_asistenciaData?['totalFaltas'] ?? 'N/A'}', style: texto1),
+                                      const SizedBox(width: 10,),
+                                      const Icon(Icons.access_time_filled, color: Colors.yellow,),
+                                      Text('${_asistenciaData?['totalTardanzas'] ?? 'N/A'}', style: texto1),
+                                    ],
+                                  ),
+                                ],
+                                
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 10),
+                              decoration: BoxDecoration(
+                                color: fondo1,
+                                borderRadius: const BorderRadius.all(Radius.circular(20))
+                              ),
+                              child: ListView.builder(
+                                itemCount: _detalleAlumnas.length,
+                                itemBuilder: (context, index) {
+                                  final alumna = _detalleAlumnas[index];
+                                  return ListTile(
+                                    title: Text(
+                                      '${alumna['apellido_paterno']} ${alumna['apellido_materno']}, ${alumna['nombre']}',
+                                      style: texto2,
+                                    ),
+                                    trailing: Container(
+                                      width: screenWidth*0.1,
+                                      child:_getEstadoIcon(alumna['estado'])
+                                      //Text('${alumna['estado']}',style: TextStyle(fontSize: 14),)
+                                      
+                                    ),
+                                    
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+          ],
+        ),
+      ),
+    );
+  }
+}
