@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loginamc/views/detailSearch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -90,6 +91,8 @@ class _BuscarViewState extends State<BuscarView> {
     } else {
       // Convertir los documentos de la subcolección en una lista de mapas
       List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs.map((doc) {
+        //print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
+        //print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
         print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
         print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
         return {'id': doc.id, ...doc.data() as Map<String, dynamic>};
@@ -326,6 +329,7 @@ DateTime? _parseDate(String dateStr) {
                                     MaterialPageRoute(
                                       builder: (context) => DetalleAlumnaView(
                                         alumna: alumna,
+                                        user: widget.user,
                                       ),
                                     ),
                                   );

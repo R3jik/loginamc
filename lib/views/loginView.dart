@@ -8,6 +8,8 @@ import 'package:loginamc/helpers/navigatorAuxiliar.dart';
 import 'package:loginamc/helpers/navigatorOwner.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/resetPassView.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class LoginPage extends StatefulWidget {
   @override
@@ -27,6 +29,29 @@ class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
   bool _obscureText = true;
   bool _isLoading = false;
+
+  late SharedPreferences _prefs;
+  String? _savedImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedImage();
+  }
+
+  Future<void> _loadSavedImage() async {
+    _prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _savedImagePath = _prefs.getString('imagePath');
+    });
+  }
+
+  Future<void> _saveImage(String imagePath) async {
+    await _prefs.setString('imagePath', imagePath);
+    setState(() {
+      _savedImagePath = imagePath;
+    });
+  }
 
   Future<void> _signInWithEmailAndPassword() async {
     if (_formKey.currentState!.validate()) {
@@ -202,6 +227,13 @@ class _LoginPageState extends State<LoginPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Center(
+                                child: _savedImagePath != null ? Image.asset(
+                                  _savedImagePath!,
+                                  width: screenWidth * 0.3, 
+                                  height: screenHeight * 0.2,
+                                  )
+                                
+                                :Image(
                                 child: Image(
                                   image: const AssetImage('assets/images/Insignia_AMC.png'),
                                   width: screenWidth * 0.3,
@@ -223,6 +255,35 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 15),
                               Text(
                                 'Usuario',
+                                style: TextStyle(
+                                  color: whiteText,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: input,
+                                  border: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su email';
+                                  }
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                    return 'Por favor ingrese un correo electrónico válido';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'Contraseña',
                                 style: TextStyle(
                                   color: whiteText,
                                   fontWeight: FontWeight.bold,

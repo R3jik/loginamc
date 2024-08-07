@@ -17,21 +17,29 @@ class ProfileAux extends StatefulWidget {
 
 class _ProfileAuxState extends State<ProfileAux> {
   Map<String, dynamic>? _profesorData;
-  // ignore: unused_field
-  String _currentDate = '';
   String cursoId = '';
+  List<Map<String, dynamic>> justificaciones = [];
+  bool _isLoading = true;
+  bool _mounted = true;
   // ignore: unused_field
   List<dynamic> _seccionData = [];
-  
-  
 
   @override
   void initState() {
     super.initState();
     _fetchProfesorData();
+    _fetchJustificaciones();
   }
 
-void _fetchProfesorData() async {
+  @override
+  void dispose() {
+    _mounted = false;
+    super.dispose();
+  }
+
+  void _fetchProfesorData() async {
+  if (!_mounted) return;
+  
   try {
     // Obtener el documento del profesor
     DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
@@ -39,23 +47,59 @@ void _fetchProfesorData() async {
         .doc(widget.profesorId.dni)
         .get();
 
+    if (!_mounted) return;  // Verificar nuevamente después de la operación asíncrona
+
     if (!profesorDoc.exists) {
       print('El documento del profesor no existe.');
       return;
     }
 
-    print('Profesor Data: ${profesorDoc.data()}');
+    //print('Profesor Data: ${profesorDoc.data()}');
 
-    // Actualizar el estado con los datos del profesor
-    setState(() {
       _profesorData = profesorDoc.data() as Map<String, dynamic>;
+      //cursoId = _profesorData?['cursoId'] ?? '';
+      _isLoading = false;
+  
+  } catch (e){
+  print('Error fetching data: $e');
+    if (_mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }}
+
+  void _fetchJustificaciones() async {
+    try {
+      QuerySnapshot justificacionesSnapshot = await FirebaseFirestore.instance
+          .collection('AUXILIARES')
+          .doc(widget.profesorId.dni)
+          .collection('JUSTIFICACIONES')
+          .get();
+
+      setState(() {
+        justificaciones = justificacionesSnapshot.docs.map((doc) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+          return {
+            'id': doc.id,
+            'numero_expediente': data['numero_expediente'] ?? '',
+            'fecha': data['fecha'] ?? '',
+            'estado': data['estado'] ?? '',
+            'descripcion_expediente': data['descripcion_expediente'] ?? '',
+            'nombreAlumna': data['nombreAlumna'] ?? '',
+          };
+        }).toList();
+      });
+    } catch (e) {
+      print('Error fetching justificaciones: $e');
+    }
       cursoId = profesorDoc['cursoId'];
     });
 
   } catch (e) {
     print('Error fetching data: $e');
   }
-}
+
 
   void _cerrarSesion() async {
     await FirebaseAuth.instance.signOut();
@@ -94,7 +138,9 @@ DateTime? _parseDate(dynamic fecha) {
 
     return SafeArea(
       child: Scaffold(
-        body: Stack(
+        body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Stack(
           children: [
             Positioned(
               top: 0,
@@ -147,7 +193,7 @@ DateTime? _parseDate(dynamic fecha) {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Nombre:',
                                     style: textoDatosProf,
@@ -163,7 +209,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   child: Text('${_profesorData?['nombre'] ?? ''}', style: textoDatosProf),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Apellido Paterno:',
                                     style: textoDatosProf,
@@ -179,7 +225,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   child: Text('${_profesorData?['apellido_paterno'] ?? ''}', style: textoDatosProf),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Apellido Materno:',
                                     style: textoDatosProf,
@@ -204,6 +250,7 @@ DateTime? _parseDate(dynamic fecha) {
                                 Container(
                                   width: 180,
                                   child: Text(
+                                    '${_profesorData?['cursoId'] ?? ''}',
                                     '${_profesorData?['CursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
@@ -219,6 +266,47 @@ DateTime? _parseDate(dynamic fecha) {
                   
                 const SizedBox(height: 20,),
                 
+                const Text('Justificaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                
+                const SizedBox(height: 20,),
+
+                ListView.builder(
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: justificaciones.length,
+                itemBuilder: (context, index) {
+                  final justificacion = justificaciones[index];
+                  return Column(
+                    children: [
+                      Card(
+                        color: Colors.blue[900],
+                        child: ListTile(
+                          title: Text('Expediente: ${justificacion['numero_expediente']}',
+                              style: const TextStyle(color: Colors.white)),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Fecha: ${justificacion['fecha']}', style: const TextStyle(color: Colors.white70)),
+                              Text('Estado: ${justificacion['estado']}', style: const TextStyle(color: Colors.white70)),
+                              Text('Alumna: ${justificacion['nombreAlumna']}', style: const TextStyle(color: Colors.white70)),
+                            ],
+                          ),
+                          trailing: const Icon(Icons.check_circle, color: Colors.green),
+                          onTap: () {
+                            AlertDialog(
+                              title: Text("a"),
+                              actions: [
+                                ElevatedButton(onPressed: (){}, child: Text("Info aqui"))
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 10,),
+                    ],
+                  );
+                },
+              ),
               ],
             ),
           ),
