@@ -1,4 +1,4 @@
-// ignore_for_file: unused_field
+import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,6 @@ class detailAssistancePage extends StatefulWidget {
   final String seccionId;
   final AppUser profesorId;
   final String asistenciaId;
-  
 
   detailAssistancePage({
     super.key,
@@ -28,12 +27,31 @@ class _detailAssistancePageState extends State<detailAssistancePage> {
   Map<String, dynamic>? _asistenciaData;
   List<Map<String, dynamic>> _detalleAlumnas = [];
   bool _isLoading = true;
+  bool _showFirstIcon = true;
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
     TimeZoneHelper.initializeTimeZones();
     _fetchDatosAsistencia();
+    _timer = Timer.periodic(Duration(seconds: 2), (Timer timer) {
+      _toggleIcon();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _toggleIcon() {
+    if (mounted) {
+      setState(() {
+        _showFirstIcon = !_showFirstIcon;
+      });
+    }
   }
 
   Future<void> _fetchDatosAsistencia() async {
@@ -62,10 +80,10 @@ class _detailAssistancePageState extends State<detailAssistancePage> {
         });
 
         QuerySnapshot detalleSnapshot = await asistenciaDoc.reference
-        .collection('DETALLES')
-        .orderBy('apellido_paterno')
-        .orderBy('apellido_materno')
-        .get();
+            .collection('DETALLES')
+            .orderBy('apellido_paterno')
+            .orderBy('apellido_materno')
+            .get();
 
         setState(() {
           _detalleAlumnas = detalleSnapshot.docs.map((doc) {
@@ -83,11 +101,14 @@ class _detailAssistancePageState extends State<detailAssistancePage> {
     } catch (e) {
       print('Error al obtener los datos de asistencia: $e');
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
+
   Icon _getEstadoIcon(String estado) {
     switch (estado) {
       case 'asistencia':
@@ -107,18 +128,20 @@ class _detailAssistancePageState extends State<detailAssistancePage> {
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
     TextStyle texto1 = const TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,);
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    );
     TextStyle texto2 = const TextStyle(
-    fontSize: 14,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,);
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    );
 
     return SafeArea(
       child: Scaffold(
         body: Stack(
-          children:[ 
+          children: [
             Positioned(
               top: 0,
               child: Container(
@@ -128,102 +151,180 @@ class _detailAssistancePageState extends State<detailAssistancePage> {
               ),
             ),
             _isLoading
-              ? Center(child: CircularProgressIndicator())
-              : _asistenciaData == null
-                  ? Center(child: Text('No se encontraron datos de asistencia'))
-                  : Padding(
-                      padding: const EdgeInsets.all(14.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 165,
-                            width: screenWidth,
-                            decoration: BoxDecoration(
-                              color: fondo1,
-                              borderRadius: const BorderRadius.all(Radius.circular(20))
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text('Curso: ${_asistenciaData?['cursoId'] ?? 'N/A'}', style: texto1),
-                                          Text('Grado: ${widget.seccionId.substring(1,2)}', style: texto1),
-                                          Text('Sección: ${widget.seccionId.substring(2,3)}', style: texto1),
-                                        ],
-                                      ),
-                                      Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(Icons.calendar_month,color: whiteColor,),
-                                              Text('${_asistenciaData?['fecha'] ?? 'N/A'}', style: texto1),
-                                            ],
-                                          ),
-                                          Text('${_asistenciaData?['hora'] ?? 'N/A'}', style: texto1),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 20,),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.group,color: whiteColor,),
-                                      Text('${_asistenciaData?['totalAlumnas'] ?? 'N/A'}', style: texto1),
-                                      const SizedBox(width: 30,),
-                                      const Icon(Icons.check_circle,color: Colors.green,),
-                                      Text('${_asistenciaData?['totalAsistencias'] ?? 'N/A'}', style: texto1),
-                                      const SizedBox(width: 10,),
-                                      const Icon(Icons.remove_circle, color: Colors.red,),
-                                      Text('${_asistenciaData?['totalFaltas'] ?? 'N/A'}', style: texto1),
-                                      const SizedBox(width: 10,),
-                                      const Icon(Icons.access_time_filled, color: Colors.yellow,),
-                                      Text('${_asistenciaData?['totalTardanzas'] ?? 'N/A'}', style: texto1),
-                                    ],
-                                  ),
-                                ],
-                                
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(top: 10),
+                ? Center(child: CircularProgressIndicator())
+                : _asistenciaData == null
+                    ? Center(child: Text('No se encontraron datos de asistencia'))
+                    : Padding(
+                        padding: const EdgeInsets.all(14.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              height: 165,
+                              width: screenWidth,
                               decoration: BoxDecoration(
-                                color: fondo1,
-                                borderRadius: const BorderRadius.all(Radius.circular(20))
-                              ),
-                              child: ListView.builder(
-                                itemCount: _detalleAlumnas.length,
-                                itemBuilder: (context, index) {
-                                  final alumna = _detalleAlumnas[index];
-                                  return ListTile(
-                                    title: Text(
-                                      '${alumna['apellido_paterno']} ${alumna['apellido_materno']}, ${alumna['nombre']}',
-                                      style: texto2,
+                                  color: fondo1,
+                                  borderRadius:
+                                      const BorderRadius.all(Radius.circular(20))),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                'Curso: ${_asistenciaData?['cursoId'] ?? 'N/A'}',
+                                                style: texto1),
+                                            Text(
+                                                'Grado: ${widget.seccionId.substring(1, 2)}',
+                                                style: texto1),
+                                            Text(
+                                                'Sección: ${widget.seccionId.substring(2, 3)}',
+                                                style: texto1),
+                                          ],
+                                        ),
+                                        Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.calendar_month,
+                                                  color: whiteColor,
+                                                ),
+                                                Text(
+                                                    '${_asistenciaData?['fecha'] ?? 'N/A'}',
+                                                    style: texto1),
+                                              ],
+                                            ),
+                                            Text(
+                                                '${_asistenciaData?['hora'] ?? 'N/A'}',
+                                                style: texto1),
+                                          ],
+                                        ),
+                                      ],
                                     ),
-                                    trailing: Container(
-                                      width: screenWidth*0.1,
-                                      child:_getEstadoIcon(alumna['estado'])
-                                      //Text('${alumna['estado']}',style: TextStyle(fontSize: 14),)
-                                      
+                                    const SizedBox(
+                                      height: 20,
                                     ),
-                                    
-                                  );
-                                },
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.group,
+                                          color: whiteColor,
+                                        ),
+                                        Text(
+                                            '${_asistenciaData?['totalAlumnas'] ?? 'N/A'}',
+                                            style: texto1),
+                                        const SizedBox(
+                                          width: 30,
+                                        ),
+                                        const Icon(
+                                          Icons.check_circle,
+                                          color: Colors.green,
+                                        ),
+                                        Text(
+                                            '${_asistenciaData?['totalAsistencias'] ?? 'N/A'}',
+                                            style: texto1),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        const Icon(
+                                          Icons.remove_circle,
+                                          color: Colors.red,
+                                        ),
+                                        Text(
+                                            '${_asistenciaData?['totalFaltas'] ?? 'N/A'}',
+                                            style: texto1),
+                                        const SizedBox(
+                                          width: 10,
+                                        ),
+                                        const Icon(
+                                          Icons.access_time_filled,
+                                          color: Colors.yellow,
+                                        ),
+                                        Text(
+                                            '${_asistenciaData?['totalTardanzas'] ?? 'N/A'}',
+                                            style: texto1),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                decoration: BoxDecoration(
+                                    color: fondo1,
+                                    borderRadius:
+                                        const BorderRadius.all(Radius.circular(20))),
+                                child: ListView.builder(
+                                  itemCount: _detalleAlumnas.length,
+                                  itemBuilder: (context, index) {
+                                    final alumna = _detalleAlumnas[index];
+                                    return ListTile(
+                                      title: Text(
+                                        '${alumna['apellido_paterno']} ${alumna['apellido_materno']}, ${alumna['nombre']}',
+                                        style: texto2,
+                                      ),
+                                      trailing: Container(
+                                        width: screenWidth * 0.1,
+                                        child: Stack(
+                                          alignment: Alignment.center,
+                                          children: [
+                                            if (alumna['estado'] == 'falta justificada')
+                                              AnimatedSwitcher(
+                                                  duration: const Duration(seconds: 1),
+                                                  child: _showFirstIcon
+                                                      ? Icon(
+                                                          Icons.remove_circle,
+                                                          key: ValueKey(1),
+                                                          color: Colors.red,
+                                                        )
+                                                      : Icon(
+                                                          Icons
+                                                              .playlist_add_check_circle_rounded,
+                                                          key: ValueKey(2),
+                                                          color: Color.fromARGB(
+                                                              255, 221, 221, 221),
+                                                        ))
+                                            else if (alumna['estado'] ==
+                                                'tardanza justificada')
+                                              AnimatedSwitcher(
+                                                  duration: const Duration(seconds: 1),
+                                                  child: _showFirstIcon
+                                                      ? Icon(
+                                                          Icons.access_time_filled,
+                                                          key: ValueKey(1),
+                                                          color: Colors.yellow,
+                                                        )
+                                                      : Icon(
+                                                          Icons
+                                                              .playlist_add_check_circle_rounded,
+                                                          key: ValueKey(2),
+                                                          color: Color.fromARGB(
+                                                              255, 221, 221, 221),
+                                                        ))
+                                            else if (alumna['estado'] !=
+                                                    'falta justificada' ||
+                                                alumna['estado'] != 'tardanza justificada')
+                                              _getEstadoIcon(alumna['estado'])
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
           ],
         ),
       ),

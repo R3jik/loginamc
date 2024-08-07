@@ -83,7 +83,7 @@ class _BuscarViewState extends State<BuscarView> {
           }
 
           QuerySnapshot detallesSnapshot = await asistenciaDoc.reference.collection('DETALLES')
-              .where('estado', whereIn: ['falta', 'tardanza', 'justificacion'])
+              .where('estado', whereIn: ['falta', 'tardanza', 'falta justificada', 'tardanza justificada'])
               .get(); 
 
           for (var detalleDoc in detallesSnapshot.docs) {
@@ -299,7 +299,7 @@ DateTime? _parseDate(String dateStr) {
                                             const Icon(Icons.remove_circle, color: Colors.red, size: 30),
                                           if (alumna['estado'] == 'tardanza')
                                             const Icon(Icons.access_time_filled, color: Colors.yellow, size: 30),
-                                          if (alumna['estado'] == 'justificacion')
+                                          if (alumna['estado'] == 'falta justificada' || alumna['estado'] == 'tardanza justificada')
                                             const Icon(Icons.playlist_add_check_circle_rounded, color: Color.fromARGB(255, 221, 221, 221), size: 30),
                                         ],
                                       ),
