@@ -186,7 +186,7 @@ DateTime? _parseDate(dynamic fecha) {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Nombre:',
                                     style: textoDatosProf,
@@ -202,7 +202,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   child: Text('${_profesorData?['nombre'] ?? ''}', style: textoDatosProf),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Apellido Paterno:',
                                     style: textoDatosProf,
@@ -218,7 +218,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   child: Text('${_profesorData?['apellido_paterno'] ?? ''}', style: textoDatosProf),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.only(left:8.0),
+                                  padding: const EdgeInsets.only(left:0),
                                   child: Text(
                                     'Apellido Materno:',
                                     style: textoDatosProf,
@@ -243,7 +243,7 @@ DateTime? _parseDate(dynamic fecha) {
                                 Container(
                                   width: 180,
                                   child: Text(
-                                    '${_profesorData?['CursoId'] ?? ''}',
+                                    '${_profesorData?['cursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
                                 ),

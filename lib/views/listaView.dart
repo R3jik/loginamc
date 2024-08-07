@@ -87,6 +87,12 @@ class _AsistenciaViewState extends State<AsistenciaView> {
 
       // Si tampoco existe en OWNERS, lanza una excepción
       if (!profesorDoc.exists) {
+        profesorDoc = await FirebaseFirestore.instance
+          .collection('AUXILIARES')
+          .doc(widget.profesorId)
+          .get();
+        
+      }else {
         throw Exception('El documento del profesor no existe en PROFESORES ni en OWNERS');
       }
     }
@@ -155,10 +161,19 @@ class _AsistenciaViewState extends State<AsistenciaView> {
         .collection('PROFESORES')
         .doc(widget.profesorId);
 
-    // Verificar si el documento del profesor existe
     DocumentSnapshot profesorDoc = await profesorRef.get();
+
+    // Si no existe en PROFESORES, buscar en AUXILIARES
     if (!profesorDoc.exists) {
-      throw Exception('El documento del profesor no existe en la colección PROFESORES');
+      profesorRef = FirebaseFirestore.instance
+          .collection('AUXILIARES')
+          .doc(widget.profesorId);
+      profesorDoc = await profesorRef.get();
+
+      // Si tampoco existe en AUXILIARES, lanzar una excepción
+      if (!profesorDoc.exists) {
+        throw Exception('El documento del profesor no existe PROFESORES ni en AUXILIARES');
+      }
     }
 
     
