@@ -28,7 +28,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
     super.initState();
     _widgetOptions = <Widget>[
       Mainview(user: widget.user),     
-      BuscarView(user: widget.user),
+      // BuscarView(user: widget.user),
       ProfesorProfile(profesorId: widget.user),
       // AdminPanel(user: widget.user),
     ];
@@ -48,7 +48,7 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+          padding: const EdgeInsets.symmetric(horizontal: 85, vertical: 0),
           color: const Color.fromRGBO(0, 18, 31, 1),
           child: GNav(
             tabMargin: const EdgeInsets.only(top: 2, bottom: 0),
@@ -65,10 +65,10 @@ class _NavigatorProfesorState extends State<NavigatorProfesor> {
                 icon: Icons.home,
                 text: "Inicio",
               ),
-              GButton(
-                icon: Icons.search_rounded,
-                text: "Buscar",
-              ),
+              // GButton(
+              //   icon: Icons.search_rounded,
+              //   text: "Buscar",
+              // ),
               GButton(
                 icon: Icons.person_pin,
                 text: "Perfil",

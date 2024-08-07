@@ -22,7 +22,6 @@ class _ProfileAuxState extends State<ProfileAux> {
   String cursoId = '';
   // ignore: unused_field
   List<dynamic> _seccionData = [];
-  Map<String, dynamic>? _cursoData;
   
   
 
@@ -51,25 +50,6 @@ void _fetchProfesorData() async {
     setState(() {
       _profesorData = profesorDoc.data() as Map<String, dynamic>;
       cursoId = profesorDoc['cursoId'];
-    });
-
-    // Obtener el documento del curso
-    DocumentSnapshot<Map<String, dynamic>> nombreCurso = await FirebaseFirestore
-        .instance
-        .collection('AUXILIARES')
-        .doc(widget.profesorId.dni)
-        .get();
-    
-    if (!nombreCurso.exists) {
-      print('El documento del curso no existe.');
-      return;
-    }
-
-    print('Curso Data: ${nombreCurso.data()}');
-
-    // Actualizar el estado con los datos del curso
-    setState(() {
-      _cursoData = nombreCurso.data();
     });
 
   } catch (e) {
@@ -125,11 +105,11 @@ DateTime? _parseDate(dynamic fecha) {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(13),
               child: Column(
                 children: [
                   Container(
-                    margin: const EdgeInsets.all(5),
+                    margin: const EdgeInsets.all(0),
                     width: screenWidth,
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -222,9 +202,9 @@ DateTime? _parseDate(dynamic fecha) {
                                 IconoPerfil(),
                                 const SizedBox(height: 20),
                                 Container(
-                                  width: 200,
+                                  width: 180,
                                   child: Text(
-                                    '${_cursoData?['CursoId'] ?? ''}',
+                                    '${_profesorData?['CursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
                                 ),

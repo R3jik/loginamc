@@ -161,185 +161,189 @@ class _LoginPageState extends State<LoginPage> {
 
     return SafeArea(
       child: Scaffold(
+        backgroundColor: fondo,
         body: LayoutBuilder(
           builder: (context, constraints) {
             return Stack(
               children: [
+                // Onda superior derecha
                 Positioned(
                   top: 0,
-                  child: Container(
-                    width: screenWidth,
-                    height: screenHeight,
-                    color: fondo,
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topRight,
+                  right: 0,
                   child: CustomPaint(
-                    size: Size(screenWidth * 0.4, screenHeight * 0.2),
+                    size: Size(constraints.maxWidth * 0.4, constraints.maxHeight * 0.2),
                     painter: WavePainter(),
                   ),
                 ),
+                // Onda inferior izquierda
                 Positioned(
                   bottom: 0,
                   left: 0,
                   child: Transform.rotate(
                     angle: 3.14159,
                     child: CustomPaint(
-                      size: Size(screenWidth * 0.4, screenHeight * 0.2),
+                      size: Size(constraints.maxWidth * 0.4, constraints.maxHeight * 0.2),
                       painter: WavePainter(),
                     ),
                   ),
                 ),
+                // Formulario desplazable
                 SingleChildScrollView(
-                  child: Form(
-                    key: _formKey,
-                    child: Padding(
-                      padding: const EdgeInsets.only(top: 60, left: 30, right: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Image(
-                              image: const AssetImage('assets/images/Insignia_AMC.png'),
-                              width: screenWidth * 0.3,
-                              height: screenHeight * 0.2,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Center(
-                            child: Text(
-                              'INGRESE SU CUENTA',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 28,
-                                color: whiteText,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          Text(
-                            'Usuario',
-                            style: TextStyle(
-                              color: whiteText,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: input,
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(50)),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor ingrese su email';
-                              }
-                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                return 'Por favor ingrese un correo electrónico válido';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-                          Text(
-                            'Contraseña',
-                            style: TextStyle(
-                              color: whiteText,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
-                            controller: _passwordController,
-                            obscureText: _obscureText,
-                            decoration: InputDecoration(
-                              border: const OutlineInputBorder(
-                                borderRadius: BorderRadius.all(Radius.circular(50)),
-                              ),
-                              filled: true,
-                              fillColor: input,
-                              suffixIcon: IconButton(
-                                icon: Icon(
-                                  _obscureText ? Icons.visibility : Icons.visibility_off,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureText = !_obscureText;
-                                  });
-                                },
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Por favor ingrese su contraseña';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: IntrinsicHeight(
+                      child: Form(
+                        key: _formKey,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 65, left: 30, right: 30),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
-                                },
+                              Center(
+                                child: Image(
+                                  image: const AssetImage('assets/images/Insignia_AMC.png'),
+                                  width: screenWidth * 0.3,
+                                  height: screenHeight * 0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Center(
                                 child: Text(
-                                  '¿Olvidaste tu contraseña?',
+                                  'INGRESE SU CUENTA',
                                   style: TextStyle(
-                                    color: lightBlue,
                                     fontWeight: FontWeight.bold,
+                                    fontSize: 28,
+                                    color: whiteText,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: lightBlue,
+                              const SizedBox(height: 15),
+                              Text(
+                                'Usuario',
+                                style: TextStyle(
+                                  color: whiteText,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
                                 ),
-                                onPressed: _isLoading ? null : _signInWithEmailAndPassword,
-                                child: _isLoading
-                                    ? SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
-                                        ),
-                                      )
-                                    : Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(Icons.login, color: whiteColor),
-                                          SizedBox(width: 8),
-                                          Text(
-                                            'INGRESAR',
-                                            style: TextStyle(
-                                              color: whiteColor,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
                               ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: input,
+                                  border: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su email';
+                                  }
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                    return 'Por favor ingrese un correo electrónico válido';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'Contraseña',
+                                style: TextStyle(
+                                  color: whiteText,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscureText,
+                                decoration: InputDecoration(
+                                  border: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                  filled: true,
+                                  fillColor: input,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureText ? Icons.visibility : Icons.visibility_off,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _obscureText = !_obscureText;
+                                      });
+                                    },
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su contraseña';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPasswordPage()));
+                                    },
+                                    child: Text(
+                                      '¿Olvidaste tu contraseña?',
+                                      style: TextStyle(
+                                        color: lightBlue,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: lightBlue,
+                                    ),
+                                    onPressed: _isLoading ? null : _signInWithEmailAndPassword,
+                                    child: _isLoading
+                                        ? SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
+                                            ),
+                                          )
+                                        : Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(Icons.login, color: whiteColor),
+                                              SizedBox(width: 8),
+                                              Text(
+                                                'INGRESAR',
+                                                style: TextStyle(
+                                                  color: whiteColor,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ],
+                              ),
+                              if (_errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 16.0),
+                                  child: Text(
+                                    _errorMessage!,
+                                    style: const TextStyle(color: Colors.red),
+                                  ),
+                                ),
                             ],
                           ),
-                          if (_errorMessage != null)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(color: Colors.red),
-                              ),
-                            ),
-                        ],
+                        ),
                       ),
                     ),
                   ),

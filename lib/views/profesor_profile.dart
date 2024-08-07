@@ -438,11 +438,11 @@ DateTime? _parseDate(dynamic fecha) {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(13),
               child: Column(
                 children: [
                   Container(
-                    margin: const EdgeInsets.all(5),
+                    margin: const EdgeInsets.all(0),
                     width: screenWidth,
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
@@ -535,7 +535,7 @@ DateTime? _parseDate(dynamic fecha) {
                                 IconoPerfil(),
                                 const SizedBox(height: 20),
                                 Container(
-                                  width: 200,
+                                  width: 180,
                                   child: Text(
                                     '${_cursoData?['nombre'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,

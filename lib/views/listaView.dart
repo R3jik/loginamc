@@ -274,12 +274,12 @@ class _AsistenciaViewState extends State<AsistenciaView> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(10.0),
               child: Column(
                 children: [
                   Container(
                     width: screenWidth ,
-                    height: screenHeight * 0.12,
+                    height: screenHeight * 0.15,
                     decoration:  BoxDecoration(
                       color: fondo1,
                       borderRadius:  const BorderRadius.all(Radius.circular(20))
@@ -307,6 +307,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                               ),
                               Column(
                                 children: [
+                                  const SizedBox(height:10,),
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
@@ -315,7 +316,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                                       const Icon(Icons.calendar_month, color: Colors.white, size: 30,),
                                     ],
                                   ),
-                                  const SizedBox(height: 10,),
+                                  
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                     children: [
@@ -342,21 +343,23 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                                 ],
                               ),
                             ],
-                          )
+                          ),
+                          
                         ],
+                        
                       ),
                     ),
                   ),
                   const SizedBox(height: 5),
                   Expanded(
                     child: Container(
-                      width: screenWidth * 0.9,
+                      width: screenWidth * 1,
                       decoration:  BoxDecoration(
                         color: fondo1,
                         borderRadius: const BorderRadius.all(Radius.circular(30))
                       ),
                       child: Padding(
-                        padding: const EdgeInsets.all(5),
+                        padding: const EdgeInsets.all(10),
                         child: ListView.builder(
                           itemCount: _alumnas.length,
                           itemBuilder: (context, index) {
@@ -370,9 +373,9 @@ class _AsistenciaViewState extends State<AsistenciaView> {
                                 ),
                               ),
                               trailing: Container(
-                                width: screenWidth * 0.35,
+                                width: screenWidth * 0.37,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     IconButton(
                                       icon: Icon(

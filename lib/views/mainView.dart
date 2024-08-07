@@ -146,7 +146,7 @@ void _showSecretViewMessage() {
               Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.all(screenWidth*0.05),
+                padding: EdgeInsets.all(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -184,7 +184,7 @@ void _showSecretViewMessage() {
               bottom: 0,
               child: Container(
                 width: screenWidth,
-                height: screenHeight * 0.8,
+                height: screenHeight * 0.77,
                 decoration: BoxDecoration(
                   color: fondo2,
                   borderRadius: const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))
