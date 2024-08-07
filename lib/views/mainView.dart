@@ -146,7 +146,7 @@ void _showSecretViewMessage() {
               Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.all(screenWidth*0.05),
+                padding: EdgeInsets.all(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

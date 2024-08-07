@@ -21,6 +21,8 @@ class _ProfileAuxState extends State<ProfileAux> {
   List<Map<String, dynamic>> justificaciones = [];
   bool _isLoading = true;
   bool _mounted = true;
+  // ignore: unused_field
+  List<dynamic> _seccionData = [];
 
   @override
   void initState() {
@@ -91,6 +93,11 @@ class _ProfileAuxState extends State<ProfileAux> {
     } catch (e) {
       print('Error fetching justificaciones: $e');
     }
+      cursoId = profesorDoc['cursoId'];
+    });
+
+  } catch (e) {
+    print('Error fetching data: $e');
   }
 
 
@@ -244,6 +251,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   width: 180,
                                   child: Text(
                                     '${_profesorData?['cursoId'] ?? ''}',
+                                    '${_profesorData?['CursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
                                 ),

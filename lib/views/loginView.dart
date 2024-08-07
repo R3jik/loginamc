@@ -234,6 +234,7 @@ class _LoginPageState extends State<LoginPage> {
                                   )
                                 
                                 :Image(
+                                child: Image(
                                   image: const AssetImage('assets/images/Insignia_AMC.png'),
                                   width: screenWidth * 0.3,
                                   height: screenHeight * 0.2,
@@ -254,6 +255,35 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 15),
                               Text(
                                 'Usuario',
+                                style: TextStyle(
+                                  color: whiteText,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _emailController,
+                                decoration: InputDecoration(
+                                  filled: true,
+                                  fillColor: input,
+                                  border: const OutlineInputBorder(
+                                    borderRadius: BorderRadius.all(Radius.circular(50)),
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Por favor ingrese su email';
+                                  }
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                    return 'Por favor ingrese un correo electrónico válido';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 16.0),
+                              Text(
+                                'Contraseña',
                                 style: TextStyle(
                                   color: whiteText,
                                   fontWeight: FontWeight.bold,

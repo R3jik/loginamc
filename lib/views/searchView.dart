@@ -93,6 +93,8 @@ class _BuscarViewState extends State<BuscarView> {
       List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs.map((doc) {
         //print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
         //print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
+        print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
+        print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
         return {'id': doc.id, ...doc.data() as Map<String, dynamic>};
       }).toList();
 
