@@ -195,7 +195,7 @@ class SeccionesProfesoresPage extends StatelessWidget {
               bottom: screenHeight*0.08,
             child: Container(
               width: screenWidth,
-                height: screenHeight*0.8,
+                height: screenHeight*0.79,
                 decoration: BoxDecoration(
                   color: fondo2,
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(50))

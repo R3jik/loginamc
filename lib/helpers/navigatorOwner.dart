@@ -75,7 +75,7 @@ class _NavigatorOwnerState extends State<NavigatoeOwner> {
               ),
               GButton(
                 icon: Icons.crisis_alert_outlined,
-                text: "Graficos",
+                text: "Grafico",
               ),
             ],
             selectedIndex: _selectedIndex,

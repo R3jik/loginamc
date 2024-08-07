@@ -28,12 +28,17 @@ class _BuscarViewState extends State<BuscarView> {
   List<Map<String, dynamic>> _alumnas = [];
   List<Map<String, dynamic>> _filteredAlumnas = [];
   bool _isLoading = true;
+  List<dynamic> _seccionData = [];
+  String cursoId = '';
+  String _currentDate = '';
+  Map<String, dynamic>? _profesorData;
   // ignore: unused_field
   bool _isSortedByName = true;
 
   @override
   void initState() {
     super.initState();
+    _fetchProfesorData2();
     _loadData();
   }
 
@@ -52,6 +57,56 @@ class _BuscarViewState extends State<BuscarView> {
     }
   }
 
+  void _fetchProfesorData2() async {
+  try {
+    // Obtener el documento del profesor
+    DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
+        .collection('AUXILIARES')
+        .doc(widget.user.dni)
+        .get();
+
+    if (!profesorDoc.exists) {
+      print('El documento del profesor no existe.');
+      return;
+    }
+
+    print('Profesor Data: ${profesorDoc.data()}');
+
+    // Actualizar el estado con los datos del profesor
+    setState(() {
+      _profesorData = profesorDoc.data() as Map<String, dynamic>;
+      cursoId = profesorDoc['cursoId'];
+    });
+
+
+    // Obtener las secciones desde la subcolección SECCIONES
+    QuerySnapshot seccionesSnapshot = await FirebaseFirestore.instance
+        .collection('AUXILIARES')
+        .doc(widget.user.dni)
+        .collection('SECCIONES')
+        .get();
+    if (seccionesSnapshot.docs.isEmpty) {
+      print('No se encontraron secciones.');
+    } else {
+      // Convertir los documentos de la subcolección en una lista de mapas
+      List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs.map((doc) {
+        print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
+        print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
+        return {'id': doc.id, ...doc.data() as Map<String, dynamic>};
+      }).toList();
+
+      // Actualizar el estado con los datos de las secciones
+      setState(() {
+        _seccionData = seccionesData;
+      });
+
+      print('Secciones Data: $_seccionData'); //AQUI IMPRIME LO QUE SON DENTRO DE LOS CAMPOS QUE HAY DENTRO
+    }
+  } catch (e) {
+    print('Error fetching data: $e');
+  }
+  }
+
   Future<void> _fetchData() async {
     setState(() {
       _isLoading = true;
@@ -61,11 +116,20 @@ class _BuscarViewState extends State<BuscarView> {
       QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('PROFESORES').get();
       Map<String, Map<String, dynamic>> alumnasMap = {};
 
+      // Obtener los IDs de las secciones
+      List<String> seccionIds = _seccionData.map((seccion) => seccion['id'] as String).toList();
+
       for (var profesorDoc in profesoresSnapshot.docs) {
         QuerySnapshot asistenciasSnapshot = await profesorDoc.reference.collection('ASISTENCIAS').get();
 
         for (var asistenciaDoc in asistenciasSnapshot.docs) {
           var asistenciaData = asistenciaDoc.data() as Map<String, dynamic>;
+
+        // Filtrar por seccionId
+        if (!seccionIds.contains(asistenciaData['seccionId'])) {
+          continue;
+        }
+
           String formattedDate;
 
           if (asistenciaData.containsKey('fecha')) {
@@ -96,6 +160,7 @@ class _BuscarViewState extends State<BuscarView> {
               'apellido_materno': detalleData['apellido_materno'],
               'fecha': formattedDate,
               'estado': detalleData['estado'],
+              'seccionId': detalleData['seccionId'],
             };
           }
         }

@@ -103,18 +103,19 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
                 Container(
                 padding: const EdgeInsets.all(16),
                 child: Center(child: Row(
+                  mainAxisSize: MainAxisSize.max,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Leyenda de Graficos", 
                     style: TextStyle(
-                      color: Colors.white70, fontSize: 20, fontWeight: FontWeight.bold),
+                      color: Colors.white70, fontSize: 17, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(width: 40,),
+                    const SizedBox(width: 25,),
                     const Text("Falta", 
                     style: TextStyle(
                       color: Colors.white70, fontSize: 15,),
                     ),
-                    const SizedBox(width: 8,),
+                    const SizedBox(width: 5,),
                     Container(
                       height: 15,
                       width: 15,
@@ -126,7 +127,7 @@ class _AsistenciasGraficosViewState extends State<AttendanceDashboard> {
                     style: TextStyle(
                       color: Colors.white70, fontSize: 15,),
                     ),
-                    const SizedBox(width: 8,),
+                    const SizedBox(width: 5,),
                     Container(
                       height: 15,
                       width: 15,
