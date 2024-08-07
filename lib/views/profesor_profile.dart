@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:intl/intl.dart';
+import 'package:loginamc/views/detailAssistance.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/widgets/Icono.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -578,92 +579,97 @@ DateTime? _parseDate(dynamic fecha) {
                                               int index = entry.key;
                                               var asistencia = entry.value;
                                               String seccionId = asistencia['seccionId'] ?? '';
-                                              return Card(
-                                                color: fondo1,
-                                                child: Column(
-                                                  children: [
-                                                    ListTile(
-                                                      title: Text(
-                                                        'Grado: ${seccionId.isNotEmpty ? seccionId.substring(1, 2) : 'N/A'} Sección: ${seccionId.isNotEmpty ? seccionId.substring(2, 3) : 'N/A'}',
-                                                        style: textoDatosProf,
-                                                      ),
-                                                      subtitle: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                        children: [
-                                                          Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.start,
-
-                                                            children: [
-                                                              const Row(
-                                                                children: [
-                                                                  Icon(
-                                                                    Icons.calendar_month,
-                                                                    color: Colors.white,
-                                                                    size: 30.0,
-                                                                  ),
-                                                                  SizedBox(width: 10,),
-                                                                  Text('Fecha', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
-                                                                ],
+                                              return GestureDetector(
+                                                onTap: (){
+                                                  Navigator.push(context, MaterialPageRoute(builder: (context) => detailAssistancePage(seccionId: seccionId, profesorId:widget.profesorId , asistenciaId: asistencia['id'],)));
+                                                },
+                                                child: Card(
+                                                  color: fondo1,
+                                                  child: Column(
+                                                    children: [
+                                                      ListTile(
+                                                        title: Text(
+                                                          'Grado: ${seccionId.isNotEmpty ? seccionId.substring(1, 2) : 'N/A'} Sección: ${seccionId.isNotEmpty ? seccionId.substring(2, 3) : 'N/A'}',
+                                                          style: textoDatosProf,
+                                                        ),
+                                                        subtitle: Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                          children: [
+                                                            Column(
+                                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                                
+                                                              children: [
+                                                                const Row(
+                                                                  children: [
+                                                                    Icon(
+                                                                      Icons.calendar_month,
+                                                                      color: Colors.white,
+                                                                      size: 30.0,
+                                                                    ),
+                                                                    SizedBox(width: 10,),
+                                                                    Text('Fecha', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),),
+                                                                  ],
+                                                                  
+                                                                ),
                                                                 
-                                                              ),
-                                                              
-                                                              Text(
-                                                                asistencia['fecha'] is DateTime
-                                                                    ? DateFormat('dd-MM-yyyy').format(asistencia['fecha'])
-                                                                    : asistencia['fecha'] ?? 'Fecha no disponible',
-                                                                style: textoDatosProf,
-                                                              ),
-
-                                                            ],
-                                                          ),
-                                                          const SizedBox(width: 2,),
-                                                          Column(
-                                                            children: [
-                                                              Row(
-                                                                children: [
-                                                                  Icon(Icons.group, color: whiteColor),
-                                                                  Text('${asistencia['totalAlumnas'] ?? 'N/A'}', style: textoDatosProf),
-                                                                ],
-                                                              ),
-                                                              Row(
-                                                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                                children: [
-                                                                  const Icon(Icons.check_circle, color: Colors.green),
-                                                                  Text('${asistencia['totalAsistencias'] ?? 'N/A'}', style: textoDatosProf),
-                                                                  const SizedBox(width:5,),
-                                                                  const Icon(Icons.remove_circle, color: Colors.red,),
-                                                                  Text('${asistencia['totalFaltas'] ?? 'N/A'}', style: textoDatosProf),
-                                                                  const SizedBox(width:5,),
-                                                                  const Icon(Icons.access_time_filled, color: Colors.yellow),
-                                                                  Text('${asistencia['totalTardanzas'] ?? 'N/A'}', style: textoDatosProf),
-                                                                ],
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          const SizedBox(width: 2,),
-                                                          IconButton(
-                                                            icon: const Icon(Icons.delete, color: Colors.red, size: 30,),
-                                                            onPressed: () => _deleteAsistencia(index),
-                                                          ),
-                                                        ],
+                                                                Text(
+                                                                  asistencia['fecha'] is DateTime
+                                                                      ? DateFormat('dd-MM-yyyy').format(asistencia['fecha'])
+                                                                      : asistencia['fecha'] ?? 'Fecha no disponible',
+                                                                  style: textoDatosProf,
+                                                                ),
+                                                
+                                                              ],
+                                                            ),
+                                                            const SizedBox(width: 2,),
+                                                            Column(
+                                                              children: [
+                                                                Row(
+                                                                  children: [
+                                                                    Icon(Icons.group, color: whiteColor),
+                                                                    Text('${asistencia['totalAlumnas'] ?? 'N/A'}', style: textoDatosProf),
+                                                                  ],
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                                                  children: [
+                                                                    const Icon(Icons.check_circle, color: Colors.green),
+                                                                    Text('${asistencia['totalAsistencias'] ?? 'N/A'}', style: textoDatosProf),
+                                                                    const SizedBox(width:5,),
+                                                                    const Icon(Icons.remove_circle, color: Colors.red,),
+                                                                    Text('${asistencia['totalFaltas'] ?? 'N/A'}', style: textoDatosProf),
+                                                                    const SizedBox(width:5,),
+                                                                    const Icon(Icons.access_time_filled, color: Colors.yellow),
+                                                                    Text('${asistencia['totalTardanzas'] ?? 'N/A'}', style: textoDatosProf),
+                                                                  ],
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            const SizedBox(width: 2,),
+                                                            IconButton(
+                                                              icon: const Icon(Icons.delete, color: Colors.red, size: 30,),
+                                                              onPressed: () => _deleteAsistencia(index),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                    ElevatedButton(
-                                                      
-                                                      onPressed: () {
-                                                        setState(() {
-                                                          _selectedAsistencia = asistencia;
-                                                        });
-                                                        _exportarPDF();
-                                                      },
-                                                      child: const Text('Exportar a PDF'),
-                                                      style: ElevatedButton.styleFrom(
-                                                        padding: const EdgeInsets.only(left: 15, right: 15),
+                                                      ElevatedButton(
+                                                        
+                                                        onPressed: () {
+                                                          setState(() {
+                                                            _selectedAsistencia = asistencia;
+                                                          });
+                                                          _exportarPDF();
+                                                        },
+                                                        child: const Text('Exportar a PDF'),
+                                                        style: ElevatedButton.styleFrom(
+                                                          padding: const EdgeInsets.only(left: 15, right: 15),
+                                                        ),
+                                                        
                                                       ),
-                                                      
-                                                    ),
-                                                    const SizedBox(height: 5,),
-                                                  ],
+                                                      const SizedBox(height: 5,),
+                                                    ],
+                                                  ),
                                                 ),
                                               );
                                             }).toList(),

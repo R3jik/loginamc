@@ -29,6 +29,8 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
   String _grado = '';
   String _seccion = '';
   String _celular = "";
+  List<Map<String, dynamic>> _dataDetalleAlumna =[];
+  String mensajeJustificacion ="";
 
   @override
   void initState() {
@@ -138,7 +140,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
               tardanzas.add(data);
             } else if (data['estado'] == 'falta') {
               faltas.add(data);
-            } else if (data['estado'] == 'justificacion') {
+            } else if (data['estado'] == 'tardanza justificada' || data['estado'] == 'falta justificada') {
               justificaciones.add(data);
             }
           }
@@ -191,15 +193,18 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 
   Future<void> _justificarAsistencia(String alumnoId, String profesorId, String asistenciaId) async {
     try {
-      await FirebaseFirestore.instance
-          .collection('PROFESORES')
-          .doc(profesorId)
-          .collection('ASISTENCIAS')
-          .doc(asistenciaId)
-          .collection('DETALLES')
-          .doc(alumnoId)
+      DocumentReference estadoRef = FirebaseFirestore.instance.collection('PROFESORES')
+        .doc(profesorId)
+        .collection('ASISTENCIAS')
+        .doc(asistenciaId)
+        .collection('DETALLES')
+        .doc(alumnoId);
+      DocumentSnapshot _dataDetalleAlumna = await estadoRef.get();
+      final String justificacion = '${_dataDetalleAlumna['estado']} justificada';
+
+      await estadoRef
           .update({
-        'estado': 'justificacion',
+        'estado': justificacion,
       });
 
       print('Asistencia justificada con éxito para el alumno con ID: $alumnoId');
@@ -343,6 +348,65 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
   }
 }
 
+Future<void> _showInputDialog(String alumnoId, String profesorId, String asistenciaId) async {
+    TextEditingController textController = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Ingrese los datos de la justificación'),
+          content: TextField(
+            controller: textController,
+            decoration: const InputDecoration(hintText: "N° de expediente y motivo de justificación"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cierra el diálogo
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                String textJustificacion = textController.text; // Guarda el texto ingresado
+                _justificarAsistencia(alumnoId, profesorId, asistenciaId);
+                Navigator.of(context).pop(); // Cierra el diálogo
+                
+                setState(() {
+                  mensajeJustificacion = textJustificacion;
+                });
+                print('Mensaje de justificación: $mensajeJustificacion');
+              },
+              child: const Text('Justificar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _openMessageDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Datos de la justificación'),
+          content: Text(mensajeJustificacion), //el mensaje solo se muestra si se justifica y se selecciona para mostrar
+          //dentro de la misma ventana si se sale de la ventana no aparece mensaje ya que no esta en firebase.
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
 Widget build(BuildContext context) {
   return SafeArea(
@@ -428,7 +492,7 @@ Widget build(BuildContext context) {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${widget.alumna['nombre']} ',
+                                              '${widget.alumna['nombre'].toString().trim()} ',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -457,7 +521,7 @@ Widget build(BuildContext context) {
                                           child: Padding(
                                             padding: const EdgeInsets.only(left: 10),
                                             child: Text(
-                                              '${widget.alumna['apellido_paterno']} ',
+                                              '${widget.alumna['apellido_paterno'].toString().trim()} ',
                                               style: const TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -487,7 +551,7 @@ Widget build(BuildContext context) {
                                             child: Padding(
                                               padding: const EdgeInsets.only(left: 10),
                                               child: Text(
-                                                '${widget.alumna['apellido_materno']}',
+                                                '${widget.alumna['apellido_materno'].toString().trim()} ',
                                                 style: const TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.bold,
@@ -675,12 +739,16 @@ Widget _buildAsistenciasList(String title, List<Map<String, dynamic>> asistencia
                         if (title != 'Justificaciones')
                           IconButton(
                             icon: Icon(Icons.check, color: Colors.greenAccent,),
-                            onPressed: () => _justificarAsistencia(
+                            onPressed: () => _showInputDialog(
                               asistencia['id'],
                               asistencia['profesorId'],
                               asistencia['asistenciaId'],
                             ),
                           ),
+                        if (title == 'Justificaciones')
+                          IconButton(
+                            onPressed: _openMessageDialog, 
+                            icon: Icon(Icons.description,color: Colors.greenAccent)),
                         IconButton(
                           icon: Icon(Icons.delete, color: Colors.red),
                           onPressed: () => _cambiarEstadoAsistencia(
