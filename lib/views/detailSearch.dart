@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:loginamc/views/loginView.dart';
 // ignore: unused_import
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz;
@@ -9,8 +10,8 @@ import 'package:url_launcher/url_launcher.dart';
 // ignore: must_be_immutable
 class DetalleAlumnaView extends StatefulWidget {
   final Map<String, dynamic> alumna;
-
-  DetalleAlumnaView({required this.alumna});
+  final AppUser user;
+  DetalleAlumnaView({required this.alumna, required this.user});
 
   @override
   _DetalleAlumnaViewState createState() => _DetalleAlumnaViewState();
@@ -31,6 +32,8 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
   String _celular = "";
   List<Map<String, dynamic>> _dataDetalleAlumna =[];
   String mensajeJustificacion ="";
+  String textJustificacion ="";
+  String numeroExpe = "";
 
   @override
   void initState() {
@@ -140,7 +143,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
               tardanzas.add(data);
             } else if (data['estado'] == 'falta') {
               faltas.add(data);
-            } else if (data['estado'] == 'tardanza justificada' || data['estado'] == 'falta justificada') {
+            } else if (data['estado'] == 'tardanza justificada' || data['estado'] == 'falta justificada' || data['estado'] == 'falta justificada') {
               justificaciones.add(data);
             }
           }
@@ -207,12 +210,50 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
         'estado': justificacion,
       });
 
+      // Obtener los datos necesarios para la justificación
+    String fecha = _dataDetalleAlumna['fecha'] ?? '';
+    String hora = _dataDetalleAlumna['hora'] ?? '';
+    String nombreAlumna = '${widget.alumna['nombre']} ${widget.alumna['apellido_paterno']} ${widget.alumna['apellido_materno']}';
+
+    // Guardar la justificación
+    await guardarJustificacion(fecha, hora, justificacion, nombreAlumna);
+
       print('Asistencia justificada con éxito para el alumno con ID: $alumnoId');
       _fetchAsistencias();
     } catch (e) {
       print('Error justificando asistencia: $e');
     }
   }
+
+  Future<void> guardarJustificacion(String fecha, String hora, String justificacion, String nombreAlumna) async {
+  try {
+    // Referencia a la colección principal
+    CollectionReference auxiliaresRef = FirebaseFirestore.instance.collection('AUXILIARES');
+    
+    // Documento del usuario actual
+    DocumentReference userDocRef = auxiliaresRef.doc(widget.user.dni);
+
+    // Referencia a la subcolección "JUSTIFICACIONES"
+    CollectionReference justificacionesRef = userDocRef.collection('JUSTIFICACIONES');
+
+    
+    // Crear un nuevo documento con ID automático
+    await justificacionesRef.add({
+      'numero_expediente': numeroExpe,
+      'descripcion_expediente':textJustificacion,
+      'fecha': fecha,
+      'hora': hora,
+      'estado': justificacion,
+      'nombreAlumna': nombreAlumna,
+      'fechaJustificacion': FieldValue.serverTimestamp(), // Añade la fecha y hora actual del servidor
+    });
+
+    print('Justificación guardada exitosamente');
+  } catch (e) {
+    print('Error al guardar la justificación: $e');
+  }
+}
+
 
   Future<void> _cambiarEstadoAsistencia(String profesorId, String asistenciaId, String detalleId) async {
     try {
@@ -350,35 +391,92 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 
 Future<void> _showInputDialog(String alumnoId, String profesorId, String asistenciaId) async {
     TextEditingController textController = TextEditingController();
+    TextEditingController numeroExpediente = TextEditingController();
+    
 
     await showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Ingrese los datos de la justificación'),
-          content: TextField(
-            controller: textController,
-            decoration: const InputDecoration(hintText: "N° de expediente y motivo de justificación"),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(10))),
+          backgroundColor: const Color(0XFF001220),
+          elevation: 20.0,
+          title: const Text('Ingrese los datos de la justificación',
+          style: TextStyle(color: Colors.white70, fontSize: 17,
+            ),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                        style: const TextStyle(color: Colors.white70),
+                        controller: numeroExpediente,
+                          decoration: const InputDecoration(labelText: 'Número de expediente', 
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Colors.white70),
+                          prefixIcon: Icon(Icons.numbers_sharp),
+                          ),
+                        maxLength: 8,
+                        canRequestFocus: true,
+                        keyboardType: TextInputType.number,
+                        
+                      ),
+              TextField(
+                style: const TextStyle(color: Colors.white70),
+                        controller: textController,
+                        scribbleEnabled: true,
+                        canRequestFocus: true,
+                        minLines: 1,
+                        maxLines: 3,
+                        maxLength: 55,
+                          decoration: const InputDecoration(labelText: 'Motivo de la justificacion', 
+                          border: OutlineInputBorder(),
+                          labelStyle: TextStyle(color: Colors.white70),
+                          prefixIcon: Icon(Icons.draw_rounded),  
+                          ),
+              ),
+            ],
           ),
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(); // Cierra el diálogo
-              },
-              child: const Text('Cancelar'),
+            ElevatedButton(onPressed: (){Navigator.of(context).pop();}, 
+            child: Text("Cancelar"),
+            style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0XFF001220), // Background color
+                    disabledBackgroundColor: Colors.white, // Text color
+                    shadowColor: Colors.black, // Shadow color
+                    elevation: 5, // Elevation (shadow depth)
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    )
+              ),
             ),
-            TextButton(
-              onPressed: () {
-                String textJustificacion = textController.text; // Guarda el texto ingresado
+            ElevatedButton(onPressed: (){
+              if (numeroExpediente.text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('No puede estar vacio el codigo'),
+                    ),
+                  );
+                } else {               
+                textJustificacion = textController.text;
+                numeroExpe = numeroExpediente.text; // Guarda el texto ingresado
                 _justificarAsistencia(alumnoId, profesorId, asistenciaId);
-                Navigator.of(context).pop(); // Cierra el diálogo
-                
+                  Navigator.of(context).pop();
+                }
                 setState(() {
                   mensajeJustificacion = textJustificacion;
                 });
-                print('Mensaje de justificación: $mensajeJustificacion');
-              },
-              child: const Text('Justificar'),
+                print('Numero de justificacion: $numeroExpe \nMensaje de justificación: $mensajeJustificacion');
+            }, 
+            child: const Text("Aceptar", style: TextStyle(color: Colors.white70),),
+            style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(213, 55, 32, 160), // Background color // Text color
+                    shadowColor: Colors.black, // Shadow color
+                    elevation: 5, // Elevation (shadow depth)
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    )
+              ),
             ),
           ],
         );

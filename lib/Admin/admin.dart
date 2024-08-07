@@ -90,7 +90,7 @@ class _AdminPanelState extends State<AdminPanel> {
                         title: Text(user['email'], style: const TextStyle(color: Colors.white)),
                         trailing: Icon(
                           isConnected ? Icons.circle : Icons.circle_outlined,
-                          color: isConnected ? Colors.green : Colors.red,
+                          color: isConnected ? Colors.red : Colors.green,
                         ),
                       );
                     },

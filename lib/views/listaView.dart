@@ -161,6 +161,8 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       throw Exception('El documento del profesor no existe en la colección PROFESORES');
     }
 
+    
+
     // Crear un nuevo documento en la colección ASISTENCIAS
     DocumentReference asistenciaRef = await profesorRef
         .collection('ASISTENCIAS')

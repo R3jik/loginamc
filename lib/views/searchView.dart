@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:loginamc/views/detailSearch.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -326,6 +327,7 @@ DateTime? _parseDate(String dateStr) {
                                     MaterialPageRoute(
                                       builder: (context) => DetalleAlumnaView(
                                         alumna: alumna,
+                                        user: widget.user,
                                       ),
                                     ),
                                   );
