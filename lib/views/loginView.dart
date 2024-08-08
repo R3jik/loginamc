@@ -9,19 +9,19 @@ import 'package:loginamc/helpers/navigatorOwner.dart';
 import 'package:loginamc/helpers/navigatorProfesor.dart';
 import 'package:loginamc/views/resetPassView.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-
+ 
+ 
 class LoginPage extends StatefulWidget {
   @override
   _LoginPageState createState() => _LoginPageState();
 }
-
+ 
 class AppUser {
   final String dni;
-
+ 
   AppUser({required this.dni});
 }
-
+ 
 class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -29,30 +29,30 @@ class _LoginPageState extends State<LoginPage> {
   String? _errorMessage;
   bool _obscureText = true;
   bool _isLoading = false;
-
+ 
   late SharedPreferences _prefs;
   String? _savedImagePath;
-
+ 
   @override
   void initState() {
     super.initState();
     _loadSavedImage();
   }
-
+ 
   Future<void> _loadSavedImage() async {
     _prefs = await SharedPreferences.getInstance();
     setState(() {
       _savedImagePath = _prefs.getString('imagePath');
     });
   }
-
+ 
   Future<void> _saveImage(String imagePath) async {
     await _prefs.setString('imagePath', imagePath);
     setState(() {
       _savedImagePath = imagePath;
     });
   }
-
+ 
   Future<void> _signInWithEmailAndPassword() async {
     if (_formKey.currentState!.validate()) {
       if(mounted){
@@ -68,13 +68,13 @@ class _LoginPageState extends State<LoginPage> {
           password: _passwordController.text,
         );
         User user = userCredential.user!;
-
+ 
         await FirebaseFirestore.instance
           .collection('USUARIOS')
           .doc(user.uid)
           .update({'isConnected': true});
-
-
+ 
+ 
         await _redirectUserBasedOnRole(user);
         String contrasena =_passwordController.text;
       await _updatePassword(user, contrasena); //implemantación de código para agregar un campo contraseña en cada DOCUMENTO de usuarios
@@ -110,19 +110,19 @@ class _LoginPageState extends State<LoginPage> {
         });
         }
       }
-      
+ 
     }
   }
-
+ 
   Future<void> _redirectUserBasedOnRole(User user) async {
-    
+ 
       DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).get();
       if (userDoc.exists) {
         String role = userDoc.get('rol').toString().toUpperCase();
         String dni = userDoc.get('dni').toString();
         AppUser appUser = AppUser(dni: dni);
-
-        
+ 
+ 
         if (role == 'PROFESOR') {
           Navigator.pushReplacement(
             context,
@@ -158,9 +158,9 @@ class _LoginPageState extends State<LoginPage> {
           _errorMessage = 'Usuario no registrado';
         });
       }
-
-      
-    
+ 
+ 
+ 
   }
   Future<void> _updatePassword(User user, String contrasena) async{
     await FirebaseFirestore.instance.collection('USUARIOS').doc(user.uid).set({
@@ -169,21 +169,21 @@ class _LoginPageState extends State<LoginPage> {
       print("Error al actualizar la contraseña: $_errorMessage");
     });
   }
-
-  
-
+ 
+ 
+ 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final screenWidth = screenSize.width;
     final screenHeight = screenSize.height;
-
+ 
     Color whiteColor = const Color(0XFFF6F6F6);
     Color lightBlue = const Color(0XFF0066FF);
     Color fondo = const Color(0XFF001220);
     Color whiteText = const Color(0XFFF3F3F3);
     Color input = const Color(0XFFD3E5FF);
-
+ 
     return SafeArea(
       child: Scaffold(
         backgroundColor: fondo,
@@ -232,9 +232,8 @@ class _LoginPageState extends State<LoginPage> {
                                   width: screenWidth * 0.3, 
                                   height: screenHeight * 0.2,
                                   )
-                                
+ 
                                 :Image(
-                                child: Image(
                                   image: const AssetImage('assets/images/Insignia_AMC.png'),
                                   width: screenWidth * 0.3,
                                   height: screenHeight * 0.2,
@@ -255,35 +254,6 @@ class _LoginPageState extends State<LoginPage> {
                               const SizedBox(height: 15),
                               Text(
                                 'Usuario',
-                                style: TextStyle(
-                                  color: whiteText,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller: _emailController,
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: input,
-                                  border: const OutlineInputBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(50)),
-                                  ),
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Por favor ingrese su email';
-                                  }
-                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                                    return 'Por favor ingrese un correo electrónico válido';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 16.0),
-                              Text(
-                                'Contraseña',
                                 style: TextStyle(
                                   color: whiteText,
                                   fontWeight: FontWeight.bold,

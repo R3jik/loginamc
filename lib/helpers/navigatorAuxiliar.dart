@@ -30,7 +30,7 @@ class _NavigatorAuxiliarState extends State<NavigatorAuxiliar> {
     _widgetOptions = <Widget>[    
       Mainview(user: widget.user,),
       BuscarView(user: widget.user),
-      Assistanceaux(),
+      const Assistanceaux(),
       ProfileAux(profesorId: widget.user),
     ];
   }

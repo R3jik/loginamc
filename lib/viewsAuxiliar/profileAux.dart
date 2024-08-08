@@ -1,65 +1,62 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/widgets/Icono.dart';
-
+ 
 class ProfileAux extends StatefulWidget {
   final AppUser profesorId;
-
+ 
   const ProfileAux({Key? key, required this.profesorId}) : super(key: key);
-
+ 
   @override
   _ProfileAuxState createState() => _ProfileAuxState();
 }
-
+ 
 class _ProfileAuxState extends State<ProfileAux> {
   Map<String, dynamic>? _profesorData;
   String cursoId = '';
   List<Map<String, dynamic>> justificaciones = [];
   bool _isLoading = true;
   bool _mounted = true;
-  // ignore: unused_field
-  List<dynamic> _seccionData = [];
-
+ 
   @override
   void initState() {
     super.initState();
     _fetchProfesorData();
     _fetchJustificaciones();
   }
-
+ 
   @override
   void dispose() {
     _mounted = false;
     super.dispose();
   }
-
+ 
   void _fetchProfesorData() async {
   if (!_mounted) return;
-  
+ 
   try {
     // Obtener el documento del profesor
     DocumentSnapshot profesorDoc = await FirebaseFirestore.instance
         .collection('AUXILIARES')
         .doc(widget.profesorId.dni)
         .get();
-
+ 
     if (!_mounted) return;  // Verificar nuevamente después de la operación asíncrona
-
+ 
     if (!profesorDoc.exists) {
       print('El documento del profesor no existe.');
       return;
     }
-
+ 
     //print('Profesor Data: ${profesorDoc.data()}');
-
+ 
       _profesorData = profesorDoc.data() as Map<String, dynamic>;
       //cursoId = _profesorData?['cursoId'] ?? '';
       _isLoading = false;
-  
+ 
   } catch (e){
   print('Error fetching data: $e');
     if (_mounted) {
@@ -68,7 +65,7 @@ class _ProfileAuxState extends State<ProfileAux> {
       });
     }
   }}
-
+ 
   void _fetchJustificaciones() async {
     try {
       QuerySnapshot justificacionesSnapshot = await FirebaseFirestore.instance
@@ -76,7 +73,7 @@ class _ProfileAuxState extends State<ProfileAux> {
           .doc(widget.profesorId.dni)
           .collection('JUSTIFICACIONES')
           .get();
-
+ 
       setState(() {
         justificaciones = justificacionesSnapshot.docs.map((doc) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -93,14 +90,9 @@ class _ProfileAuxState extends State<ProfileAux> {
     } catch (e) {
       print('Error fetching justificaciones: $e');
     }
-      cursoId = profesorDoc['cursoId'];
-    });
-
-  } catch (e) {
-    print('Error fetching data: $e');
   }
-
-
+ 
+ 
   void _cerrarSesion() async {
     await FirebaseAuth.instance.signOut();
     Navigator.pushReplacement(
@@ -108,7 +100,7 @@ class _ProfileAuxState extends State<ProfileAux> {
         MaterialPageRoute(
         builder: (context) => LoginPage()));// Asegúrate de tener una ruta de login configurada
   }
-
+ 
   // Función auxiliar para parsear la fecha
 DateTime? _parseDate(dynamic fecha) {
   if (fecha is DateTime) return fecha;
@@ -123,7 +115,7 @@ DateTime? _parseDate(dynamic fecha) {
   }
   return null;
 }
-
+ 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -135,7 +127,7 @@ DateTime? _parseDate(dynamic fecha) {
     Color fondo2 = const Color(0XFF071E30);
     Color fondoDatos = const Color(0XFF001739);
     TextStyle textoDatosProf = TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: whiteText);
-
+ 
     return SafeArea(
       child: Scaffold(
         body: _isLoading
@@ -181,7 +173,7 @@ DateTime? _parseDate(dynamic fecha) {
                                   size: 35.0,
                                 ),
                               ),
-                              
+ 
                             ),
                           ],
                         )),
@@ -242,7 +234,7 @@ DateTime? _parseDate(dynamic fecha) {
                                 ),
                               ],
                             ),
-                            
+ 
                             Column(
                               children: <Widget>[
                                 IconoPerfil(),
@@ -251,7 +243,6 @@ DateTime? _parseDate(dynamic fecha) {
                                   width: 180,
                                   child: Text(
                                     '${_profesorData?['cursoId'] ?? ''}',
-                                    '${_profesorData?['CursoId'] ?? ''}',
                                     style: textoDatosProf,textAlign:  TextAlign.center,
                                   ),
                                 ),
@@ -263,13 +254,13 @@ DateTime? _parseDate(dynamic fecha) {
                       ],
                     ),
                   ),
-                  
+ 
                 const SizedBox(height: 20,),
-                
+ 
                 const Text('Justificaciones', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
-                
+ 
                 const SizedBox(height: 20,),
-
+ 
                 ListView.builder(
                 shrinkWrap: true,
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -312,9 +303,9 @@ DateTime? _parseDate(dynamic fecha) {
           ),
         ],
       ),
-
+ 
     ),
   );
 }
-
+ 
 }
