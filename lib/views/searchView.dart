@@ -93,8 +93,8 @@ class _BuscarViewState extends State<BuscarView> {
       List<Map<String, dynamic>> seccionesData = seccionesSnapshot.docs.map((doc) {
         //print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
         //print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
-        print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
-        print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
+        //print('Sección ID: ${doc.id}');       //AQUI IMPRIME LAS SECCIONES QUE SON ID
+        //print('Sección Data: ${doc.data()}');   //AQUI IMPRIME DENTRO DE LAS SECCIONES QUE CAMPOS TIENE
         return {'id': doc.id, ...doc.data() as Map<String, dynamic>};
       }).toList();
 
@@ -116,7 +116,7 @@ class _BuscarViewState extends State<BuscarView> {
     });
 
     try {
-      QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('PROFESORES').get();
+      QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('AUXILIARES').get();
       Map<String, Map<String, dynamic>> alumnasMap = {};
 
       // Obtener los IDs de las secciones

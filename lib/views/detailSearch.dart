@@ -46,7 +46,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 
   Future<void> _fetchAsistencias() async {
   try {
-    QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('PROFESORES').get();
+    QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('AUXILIARES').get();
     List<Map<String, dynamic>> tardanzas = [];
     List<Map<String, dynamic>> faltas = [];
     List<Map<String, dynamic>> justificaciones = [];
@@ -73,7 +73,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
       print('Curso del profesor: $cursoNombre');
 
       QuerySnapshot asistenciasSnapshot = await FirebaseFirestore.instance
-          .collection('PROFESORES')
+          .collection('AUXILIARES')
           .doc(profesorId)
           .collection('ASISTENCIAS')
           .get();
@@ -88,7 +88,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
         print('Hora de asistencia: $asistenciaHora');
 
         QuerySnapshot detallesSnapshot = await FirebaseFirestore.instance
-            .collection('PROFESORES')
+            .collection('AUXILIARES')
             .doc(profesorId)
             .collection('ASISTENCIAS')
             .doc(asistenciaId)
@@ -196,12 +196,20 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 
   Future<void> _justificarAsistencia(String alumnoId, String profesorId, String asistenciaId) async {
     try {
-      DocumentReference estadoRef = FirebaseFirestore.instance.collection('PROFESORES')
+      DocumentReference estadoRef = FirebaseFirestore.instance.collection('AUXILIARES')
         .doc(profesorId)
         .collection('ASISTENCIAS')
         .doc(asistenciaId)
         .collection('DETALLES')
         .doc(alumnoId);
+
+      // Referencia al documento de asistencia
+      DocumentReference asistenciaRef = FirebaseFirestore.instance.collection('AUXILIARES')
+      .doc(profesorId)
+      .collection('ASISTENCIAS')
+      .doc(asistenciaId);
+
+
       DocumentSnapshot _dataDetalleAlumna = await estadoRef.get();
       final String justificacion = '${_dataDetalleAlumna['estado']} justificada';
 
@@ -210,13 +218,20 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
         'estado': justificacion,
       });
 
+      // Incrementar el contador de justificaciones en el documento de asistencia
+      await asistenciaRef.update({
+        'totalJustificaciones': FieldValue.increment(1),
+      });
+
       // Obtener los datos necesarios para la justificación
+    String idAsistencia = asistenciaId.toString();
+    String idAlumna = alumnoId.toString();
     String fecha = _dataDetalleAlumna['fecha'] ?? '';
     String hora = _dataDetalleAlumna['hora'] ?? '';
     String nombreAlumna = '${widget.alumna['nombre']} ${widget.alumna['apellido_paterno']} ${widget.alumna['apellido_materno']}';
 
     // Guardar la justificación
-    await guardarJustificacion(fecha, hora, justificacion, nombreAlumna);
+    await guardarJustificacion(fecha, hora, justificacion, nombreAlumna, idAlumna, idAsistencia);
 
       print('Asistencia justificada con éxito para el alumno con ID: $alumnoId');
       _fetchAsistencias();
@@ -225,7 +240,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
     }
   }
 
-  Future<void> guardarJustificacion(String fecha, String hora, String justificacion, String nombreAlumna) async {
+  Future<void> guardarJustificacion(String fecha, String hora, String justificacion, String nombreAlumna, String idAlumna, String idAsistencia) async {
   try {
     // Referencia a la colección principal
     CollectionReference auxiliaresRef = FirebaseFirestore.instance.collection('AUXILIARES');
@@ -245,7 +260,9 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
       'hora': hora,
       'estado': justificacion,
       'nombreAlumna': nombreAlumna,
-      'fechaJustificacion': FieldValue.serverTimestamp(), // Añade la fecha y hora actual del servidor
+      'fechaJustificacion': FieldValue.serverTimestamp(),
+      'idAlumna': idAlumna,
+      'id': idAsistencia, // Añade la fecha y hora actual del servidor
     });
 
     print('Justificación guardada exitosamente');
@@ -258,7 +275,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
   Future<void> _cambiarEstadoAsistencia(String profesorId, String asistenciaId, String detalleId) async {
     try {
       await FirebaseFirestore.instance
-          .collection('PROFESORES')
+          .collection('AUXILIARES')
           .doc(profesorId)
           .collection('ASISTENCIAS')
           .doc(asistenciaId)
@@ -276,12 +293,12 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
 
   Future<void> _eliminarTodasAsistencias() async {
     try {
-      QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('PROFESORES').get();
+      QuerySnapshot profesoresSnapshot = await FirebaseFirestore.instance.collection('AUXILIARES').get();
 
       for (var profesorDoc in profesoresSnapshot.docs) {
         String profesorId = profesorDoc.id;
         QuerySnapshot asistenciasSnapshot = await FirebaseFirestore.instance
-            .collection('PROFESORES')
+            .collection('AUXILIARES')
             .doc(profesorId)
             .collection('ASISTENCIAS')
             .get();
@@ -290,7 +307,7 @@ class _DetalleAlumnaViewState extends State<DetalleAlumnaView> {
           String asistenciaId = asistenciaDoc.id;
           
           QuerySnapshot detallesSnapshot = await FirebaseFirestore.instance
-              .collection('PROFESORES')
+              .collection('AUXILIARES')
               .doc(profesorId)
               .collection('ASISTENCIAS')
               .doc(asistenciaId)
@@ -820,7 +837,7 @@ Widget _buildAsistenciasList(String title, List<Map<String, dynamic>> asistencia
                 return Card(
                   color: const Color(0XFF001220),
                   child: ListTile(
-                    title: Text('${asistencia['cursoNombre']}',style: const TextStyle(
+                    title: const Text(' ',style: const TextStyle(
                             fontSize: 20,
                             color: Colors.white)),
                     subtitle: Column(
