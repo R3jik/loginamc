@@ -95,7 +95,7 @@ class _ProfesorProfileState extends State<ProfesorProfile> {
     // Obtener las secciones desde la subcolección SECCIONES
     QuerySnapshot seccionesSnapshot = await FirebaseFirestore.instance
         .collection('PROFESORES')
-        .doc(widget.profesorId.dni)
+        .doc(widget.profesorId.dni)                              
         .collection('SECCIONES')
         .get();
 

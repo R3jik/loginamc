@@ -5,10 +5,8 @@ import 'package:google_nav_bar/google_nav_bar.dart';
 import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/views/mainView.dart';
 import 'package:loginamc/views/searchView.dart';
+import 'package:loginamc/viewsAuxiliar/assistanceAux.dart';
 import 'package:loginamc/viewsAuxiliar/profileAux.dart';
-
-import '../viewsAuxiliar/assistanceAux.dart';
-
 
 class NavigatorAuxiliar extends StatefulWidget {
   final AppUser user; //Cambiar el tipo de dato user a AppUser e importar la pagina loginView.dart porque ahi esta la clase creada
@@ -30,7 +28,7 @@ class _NavigatorAuxiliarState extends State<NavigatorAuxiliar> {
     _widgetOptions = <Widget>[    
       Mainview(user: widget.user,),
       BuscarView(user: widget.user),
-      Assistanceaux(),
+      AsistenciasPorMesView(profesorId: widget.user,),
       ProfileAux(profesorId: widget.user),
     ];
   }

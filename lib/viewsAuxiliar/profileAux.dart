@@ -262,43 +262,45 @@ DateTime? _parseDate(dynamic fecha) {
                 
                 const SizedBox(height: 20,),
 
-                ListView.builder(
-                shrinkWrap: true,
-                physics: const AlwaysScrollableScrollPhysics(),
-                itemCount: justificaciones.length,
-                itemBuilder: (context, index) {
-                  final justificacion = justificaciones[index];
-                  return Column(
-                    children: [
-                      Card(
-                        color: Colors.blue[900],
-                        child: ListTile(
-                          title: Text('Expediente: ${justificacion['numero_expediente']}',
-                              style: const TextStyle(color: Colors.white)),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Fecha: ${justificacion['fecha']}', style: const TextStyle(color: Colors.white70)),
-                              Text('Estado: ${justificacion['estado']}', style: const TextStyle(color: Colors.white70)),
-                              Text('Alumna: ${justificacion['nombreAlumna']}', style: const TextStyle(color: Colors.white70)),
-                            ],
-                          ),
-                          trailing: const Icon(Icons.check_circle, color: Colors.green),
-                          onTap: () {
-                            AlertDialog(
-                              title: Text("a"),
-                              actions: [
-                                ElevatedButton(onPressed: (){}, child: Text("Info aqui"))
+                Expanded(
+                  child: ListView.builder(
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: justificaciones.length,
+                  itemBuilder: (context, index) {
+                    final justificacion = justificaciones[index];
+                    return Column(
+                      children: [
+                        Card(
+                          color: Colors.blue[900],
+                          child: ListTile(
+                            title: Text('Expediente: ${justificacion['numero_expediente']}',
+                                style: const TextStyle(color: Colors.white)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Fecha: ${justificacion['fecha']}', style: const TextStyle(color: Colors.white70)),
+                                Text('Estado: ${justificacion['estado']}', style: const TextStyle(color: Colors.white70)),
+                                Text('Alumna: ${justificacion['nombreAlumna']}', style: const TextStyle(color: Colors.white70)),
                               ],
-                            );
-                          },
+                            ),
+                            trailing: const Icon(Icons.check_circle, color: Colors.green),
+                            onTap: () {
+                              AlertDialog(
+                                title: Text("a"),
+                                actions: [
+                                  ElevatedButton(onPressed: (){}, child: Text("Info aqui"))
+                                ],
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                      SizedBox(height: 10,),
-                    ],
-                  );
-                },
-              ),
+                        SizedBox(height: 10,),
+                      ],
+                    );
+                  },
+                                ),
+                ),
               ],
             ),
           ),
