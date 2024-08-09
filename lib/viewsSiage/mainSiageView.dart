@@ -4,6 +4,7 @@ import 'package:loginamc/views/loginView.dart';
 import 'package:loginamc/viewsSiage/createUsers.dart';
 import 'package:loginamc/viewsSiage/deleteUsers.dart';
 import 'package:loginamc/viewsSiage/updateAlumnas.dart';
+import 'package:loginamc/viewsSiage/updateAuxiliares.dart';
 import 'package:loginamc/viewsSiage/updateSecciones.dart';
 import 'package:loginamc/viewsSiage/updateProfesores.dart';
 
@@ -107,7 +108,7 @@ class MainSiageView extends StatelessWidget {
                                       child: CardSubirDatos(texto: "Agregar Datos de las Auxiliares",),
                           ),
                           onTap: (){
-                            //Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPageAlumna()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => UploadPageAuxiliares()));
                           },
                         ),
                         SizedBox(height: separacionCards),

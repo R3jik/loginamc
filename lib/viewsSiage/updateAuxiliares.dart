@@ -7,12 +7,12 @@ import 'package:excel/excel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:loginamc/views/mainView.dart';
 
-class UploadPageProfesores extends StatefulWidget {
+class UploadPageAuxiliares extends StatefulWidget {
   @override
-  _UploadPageProfesoresState createState() => _UploadPageProfesoresState();
+  _UploadPageAuxiliaresState createState() => _UploadPageAuxiliaresState();
 }
 
-class _UploadPageProfesoresState extends State<UploadPageProfesores> {
+class _UploadPageAuxiliaresState extends State<UploadPageAuxiliares> {
   bool _isLoading = false;
   String _message = '';
   List<List<dynamic>> _data = [];
@@ -116,8 +116,8 @@ class _UploadPageProfesoresState extends State<UploadPageProfesores> {
       bool hasEmptyCells = false;
       for (var i = 1; i < _data.length; i++) {
         var row = _data[i];
-        String profesorId = row[0]?.toString() ?? '';
-        if (profesorId.isEmpty) {
+        String auxiliarId = row[0]?.toString() ?? '';
+        if (auxiliarId.isEmpty) {
           hasEmptyCells = true;
           break;
         }
@@ -140,7 +140,7 @@ class _UploadPageProfesoresState extends State<UploadPageProfesores> {
           if ([nombre, apellidoPaterno, apellidoMaterno, genero].every((cell) => cell == '') && gradoIds.isEmpty && seccionIds.isEmpty) continue; // Ignorar filas completamente vacías
 
           // Subir los datos del profesor a Firestore
-          await FirebaseFirestore.instance.collection('PROFESORES').doc(profesorId).set({
+          await FirebaseFirestore.instance.collection('AUXILIARES').doc(auxiliarId).set({
             'nombre': nombre,
             'apellido_paterno': apellidoPaterno,
             'apellido_materno': apellidoMaterno,
@@ -151,16 +151,16 @@ class _UploadPageProfesoresState extends State<UploadPageProfesores> {
           // Subir las secciones como subcolección
           for (var seccionId in seccionIds) {
             await FirebaseFirestore.instance
-                .collection('PROFESORES')
-                .doc(profesorId)
+                .collection('AUXILIARES')
+                .doc(auxiliarId)
                 .collection('SECCIONES')
                 .doc(seccionId)
                 .set({});
           }
           for (var gradoId in gradoIds) {
             await FirebaseFirestore.instance
-                .collection('PROFESORES')
-                .doc(profesorId)
+                .collection('AUXILIARES')
+                .doc(auxiliarId)
                 .collection('GRADOS')
                 .doc(gradoId)
                 .set({});
@@ -184,7 +184,7 @@ class _UploadPageProfesoresState extends State<UploadPageProfesores> {
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => UploadPageProfesores()));
+                      builder: (context) => UploadPageAuxiliares()));
             });
           }
         }
@@ -211,7 +211,7 @@ class _UploadPageProfesoresState extends State<UploadPageProfesores> {
           leading: IconButton(
             onPressed:(){ Navigator.pop(context);}, 
             icon: Icon(Icons.arrow_back,color: whiteText,)),
-          title: Text('Subir archivo de los profesores', style: TextStyle(
+          title: Text('Subir archivo de los auxiliares', style: TextStyle(
             color: whiteText,
             fontWeight: FontWeight.bold
           ),),

@@ -28,8 +28,11 @@ class _GradosViewState extends State<Gradosview> {
   }
 
   Future<List<Map<String, dynamic>>> getGrados() async {
-    DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(widget.user.dni).get();
-    List<dynamic> gradoIds = userDoc['gradoId'];
+    QuerySnapshot userDoc = await FirebaseFirestore.instance.collection('ADMINISTRADORES').doc(widget.user.dni).collection('GRADOS').get();
+    List<dynamic> gradoIds = userDoc.docs.map((doc) => doc.id).toList();
+    if(gradoIds.isEmpty){
+      return [];
+    }
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('GRADOS').where(FieldPath.documentId,whereIn: gradoIds)
     .orderBy('numero', descending: false).get();

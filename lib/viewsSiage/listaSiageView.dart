@@ -70,7 +70,7 @@ class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
 
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        /* appBar: AppBar(
           title: Text('Alumnado del ${widget.gradoNombre} - ${widget.seccionNombre}',style: const TextStyle(
             color: Colors.white,
             fontSize: 20),),
@@ -78,7 +78,7 @@ class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
           iconTheme: const IconThemeData(
             color: Colors.white
           ),
-        ),
+        ), */
         body: Stack(
           children: [
             Positioned(
@@ -122,6 +122,7 @@ class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
                                 ],
                               ),
                               Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -131,6 +132,9 @@ class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
                                       const Icon(Icons.calendar_month, color: Colors.white, size: 30,),
                                     ],
                                   ),
+                                  Text('Grado: ${widget.seccionId.substring(1,2)}',style: texto,),
+                                  const SizedBox(width: 10,),
+                                  Text('Sección: ${widget.seccionId.substring(2,3)}',style: texto,),
                                 ],
                               ),
                             ],
@@ -164,6 +168,7 @@ class _AlumnadoSalonViewState extends State<AlumnadoSalonView> {
                               
                             );
                           },
+                          
                         ),
                       ),
                     ),
