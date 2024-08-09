@@ -97,11 +97,31 @@ void _showSecretViewMessage() {
   }
 
   Future<List<Map<String, dynamic>>> getGrados() async {
-    // Obtenemos la información del usuario (ya sea de 'PROFESORES' o 'OWNER')
-    Map<String, dynamic> userData = await getUserInfo();
 
+    List<String> collections = ['PROFESORES', 'AUXILIARES', 'OWNERS'];
+    String collectionPath = '';
+    DocumentSnapshot? userDoc;
+    for (String collection in collections) {
+      userDoc = await FirebaseFirestore.instance
+        .collection(collection)
+        .doc(widget.user.dni)
+        .get();
+    if (userDoc.exists) {
+      collectionPath = collection;
+      break;
+    }
+    }
+    if (userDoc == null || !userDoc.exists) {
+    throw Exception('Usuario no encontrado en ninguna colección');
+    }
+    QuerySnapshot subcollectionSnapshot = await FirebaseFirestore.instance
+      .collection(collectionPath)
+      .doc(widget.user.dni)
+      .collection('GRADOS')
+      .get();
+  List<String> gradoIds = subcollectionSnapshot.docs.map((doc) => doc.id).toList();
     // Suponiendo que el campo 'gradoId' tiene la misma estructura en ambas colecciones
-    List<dynamic> gradoIds = userData['gradoId'];
+    //List<dynamic> gradoIds = userData['gradoId'];
 
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('GRADOS')
@@ -146,7 +166,7 @@ void _showSecretViewMessage() {
               Align(
               alignment: Alignment.topLeft,
               child: Padding(
-                padding: EdgeInsets.all(screenWidth*0.05),
+                padding: EdgeInsets.all(12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

@@ -551,7 +551,8 @@ DateTime? _parseDate(dynamic fecha) {
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: _fetchAsistenciasFromFirebase,
+                    onPressed: 
+                    _fetchAsistenciasFromFirebase,
                     child: const Text('Cargar Asistencias'),
                   ),
                   const SizedBox(height: 20),

@@ -110,11 +110,15 @@ class _UploadPageAlumnaState extends State<UploadPageAlumna> {
         var row = _tableData[i];
         String id = row[0].toString().trim();
         if (id.isNotEmpty && id != 'No registrado' && RegExp(r'^\d{8}$').hasMatch(id)) {
+          String grado = row[4].toString().trim();
+          String seccion = row[5].toString().trim();
+          String seccionId = 'G$grado$seccion';
+
           await FirebaseFirestore.instance.collection('ALUMNAS').doc(id).set({
             'nombre': row[1].toString().trim(),
             'apellido_paterno': row[2].toString().trim(),
             'apellido_materno': row[3].toString().trim(),
-            'seccionId': row[11].toString().trim(),
+            'seccionId': seccionId,
             'genero': row[6].toString().trim(),
             'dni_apoderado': row[7].toString().trim(),
             'apellidos_nombre_apoderado': row[8].toString().trim(),
@@ -216,10 +220,13 @@ class _UploadPageAlumnaState extends State<UploadPageAlumna> {
                           : Container(),
                       const SizedBox(height: 20),
                       _tableData.isNotEmpty
-                          ? ElevatedButton(
+                          ? Column(
+                            children: [
+                            ElevatedButton(
                               onPressed: _uploadToFirestore,
-                              child: const Text('Subir a Firestore')
-                          )
+                              child: Text('Almacenar en Firestore'),
+                            ),
+                            SizedBox(height: 30,),],)
                           : Container(),
                     ],
                   ),

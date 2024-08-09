@@ -217,10 +217,13 @@ class _CreateUsersPageState extends State<CreateUsersPage> {
                           : Container(),
                       const SizedBox(height: 20),
                       _tableData.isNotEmpty
-                          ? ElevatedButton(
+                          ? Column(
+                            children: [
+                            ElevatedButton(
                               onPressed: _uploadToFirestore,
-                              child: const Text('Subir a Firestore'),
-                            )
+                              child: Text('Almacenar en Firestore'),
+                            ),
+                            SizedBox(height: 30,),],)
                           : Container(),
                     ],
                   ),

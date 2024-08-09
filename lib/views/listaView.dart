@@ -190,6 +190,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
       'totalAsistencias': _totalAsistentes,
       'totalFaltas': _totalFaltantes,
       'totalTardanzas': _totalTardanzas,
+      'totalJustificaciones': '0',
     });
 
     // Obtener el ID dinámico generado
@@ -207,6 +208,7 @@ class _AsistenciaViewState extends State<AsistenciaView> {
         'estado': alumna['estado'],
         'fecha': fecha,
         'hora': hora,
+        'idAlumna' : alumna['id'],
       });
     }
 

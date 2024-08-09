@@ -28,7 +28,7 @@ class _NavigatorAuxiliarState extends State<NavigatorAuxiliar> {
     _widgetOptions = <Widget>[    
       Mainview(user: widget.user,),
       BuscarView(user: widget.user),
-      AsistenciasPorMesView(profesorId: widget.user,),
+      AsistenciasPorMesView(profesorId: widget.user),
       ProfileAux(profesorId: widget.user),
     ];
   }
